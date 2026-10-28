@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en-GB" class="is-loading">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JALRANG — Ten Indian art traditions, drawn all the way round</title>
+<meta name="description" content="JALRANG is a fictional maker of insulated steel bottles. Edition One: ten Indian art traditions, each drawn all the way round, each in its own colour. A concept by J&amp;J Co.">
+<meta name="theme-color" content="#1A1612">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1612'/%3E%3Cpath d='M32 9c8 12 16 20 16 31a16 16 0 0 1-32 0c0-11 8-19 16-31z' fill='%23C3361D'/%3E%3Cpath d='M25 41a7 7 0 0 0 5 6' fill='none' stroke='%23F7F2E8' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>
+/* a plain message instead of a blank page when the page cannot start: opened as a file, or a script that did not load */
+(function () {
+  function say(t) {
+    if (document.getElementById('bootMsg')) return;
+    var d = document.createElement('div'); d.id = 'bootMsg'; d.className = 'noscript'; d.setAttribute('role', 'alert');
+    var p = document.createElement('p'); p.textContent = t; d.appendChild(p);
+    (document.body || document.documentElement).appendChild(d);
+  }
+  if (location.protocol === 'file:') {
+    document.addEventListener('DOMContentLoaded', function () { say('JALRANG cannot run straight from a file. Open "Open JALRANG.bat" in the folder, or use the published link.'); });
+    return;
+  }
+  addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'SCRIPT') say('Something did not load. Please check your connection and reload the page.');
+  }, true);
+})();
+</script>
+<meta property="og:title" content="JALRANG — Ten Indian art traditions, drawn all the way round">
+<meta property="og:image" content="assets/img/og-jalrang.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="JALRANG">
+<meta property="og:description" content="Ten Indian art traditions, drawn all the way round. A concept by J&amp;J Co.">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="JALRANG: ten insulated steel bottles standing in a row, each painted in one Indian art tradition.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="assets/img/bottle-01.webp" as="image">
+<link rel="preload" href="assets/fonts/jaini-normal-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/landing.css">
+<script type="importmap">{"imports": {"three": "./js/vendor/three/three.module.min.js"}}</script>
+</head>
+<body>
+<a class="skip-link t-button" href="#landing">Skip to content</a>
+<noscript><div class="noscript" role="alert"><p>JALRANG is a concept site and needs JavaScript to show its bottles. Please turn JavaScript on and reload the page.</p></div></noscript>
+
+<!-- the 3D bottles (z 30): one transparent canvas over the page; each scene draws only inside its own
+     stage (js/landing/gl.js). Hidden in the 2D and calm versions, which use the packshots. -->
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<!-- the shared header (z 50): js/shop/chrome.js fills it; js/landing/main.js sets its ink and band -->
+<header id="siteHeader"></header>
+
+<main id="landing" tabindex="-1">
+
+<!-- L1. The opening, "Jal meets Rang": a pinned film driven by scroll. JAL and RANG stand on the edge of a tank of red
+     water with a gap between them; the bottle falls through the gap, turning once, and plunges in with a splash; the
+     camera follows it down until the whole screen is Sindoor water and the bottle floats freely in it. Code:
+     js/landing/intro.js (+ hero-phys.js, hero-film.js, hero-fx.js, hero-splash.js, hero-sprites.js). The film is decorative
+     (aria-hidden); the h1, the claim and the sentence are always in the DOM. -->
+<section class="lx lx--intro" id="intro" data-ground="kajal" data-hold="190" data-hold-narrow="250" aria-labelledby="intro-h">
+  <div class="lx__stage" id="introStage">
+    <canvas class="intro__fx" aria-hidden="true"></canvas>
+    <h1 class="intro__mark" id="intro-h" aria-label="JALRANG">
+      <span class="intro__w"><span class="intro__mask"><span class="wordmark intro__word" aria-hidden="true">JAL</span></span></span>
+      <span class="intro__w"><span class="intro__mask"><span class="wordmark intro__word" aria-hidden="true">RANG</span></span></span>
+    </h1>
+    <i class="intro__line" aria-hidden="true"></i>
+    <div class="intro__pkwrap" aria-hidden="true"><img class="lx__pk intro__pk" src="assets/img/bottle-01.webp" alt="" width="720" height="971"></div>
+    <div class="intro__words">
+      <p class="t-label">Edition One · 750 ml</p>
+      <p class="t-h3 intro__claim">Ten Indian art traditions, drawn all the way round.</p>
+    </div>
+    <p class="t-body intro__body">Edition One is ten insulated steel bottles. Each carries one tradition, from Odisha to Kutch, and each has a colour of its own. Made in Morbi, Gujarat.</p>
+    <p class="t-label intro__cap">No. 01 · Pattachitra · Sindoor</p>
+    <p class="t-label intro__cue" aria-hidden="true"><span>Scroll</span><i></i></p>
+    <i class="bhit" aria-hidden="true" data-cursor="NO. 01 · PATTACHITRA" data-cursor-coin="01"></i>
+  </div>
+</section>
+
+<!-- L2. A painting first: the maker's story in three steps, one frame of photographs on the right.
+     Each next photograph rises into the frame under a straight line as the steps advance. -->
+<section class="lx lx--craft" id="craft" data-ground="chuna" data-hold="120" aria-labelledby="craft-h">
+  <div class="lx__stage paper" id="craftStage">
+    <div class="craft__words">
+      <h2 class="t-h2 craft__title" id="craft-h">A painting first.</h2>
+      <p class="t-body craft__body">Every edition begins as a full-size painting by an artist of that tradition. We print it round the steel in one piece, with the join at the back, and engrave the artist's name and the edition number on the base. Every bottle sold pays the artist.</p>
+      <ol class="steps" id="craftSteps">
+        <li class="steps__row is-active"><span class="t-label">01</span><span class="t-small">Painted at full size</span></li>
+        <li class="steps__row"><span class="t-label">02</span><span class="t-small">Printed round the steel in one piece</span></li>
+        <li class="steps__row"><span class="t-label">03</span><span class="t-small">Signed on the base</span></li>
+      </ol>
+    </div>
+    <figure class="craft__fig">
+      <div class="craft__frame" id="craftFrame">
+        <img class="craft__img craft__img--1" src="assets/img/hands-brush.webp" alt="Hands drawing small white Warli figures with a bamboo stick on a red-ochre panel." width="1086" height="1448" loading="lazy">
+        <div class="craft__img craft__img--2 craft__geru" data-edition="02"><img data-src="assets/img/bottle-02.webp" alt="No. 02, Warli: the painting printed round the steel in one piece." width="720" height="971" loading="lazy"></div>
+        <img class="craft__img craft__img--3" data-src="assets/img/macro-base.webp" alt="The engraved base of the Warli bottle: JALRANG, Edition One, No. 02, Warli, drawn by an artist of the Warli tradition." width="1254" height="1254" loading="lazy">
+      </div>
+      <figcaption class="craft__caps"><span class="t-label">No. 02 · Warli · Geru</span><span class="t-small craft__cap" id="craftCap">01 · Painted at full size</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- L3. The ten designs: pinned, driven by scroll. One bottle in the middle; at each step its painting
+     peels off to the left as a flat cloth while the next one comes in from the right and wraps on.
+     The two frames (a, b) are the same composition; b is revealed right of the colour line.
+     The hold is 1700 vh (it was 900): one swap takes 115.6 vh of scroll, slow and heavy (cloth.js). On a
+     phone or an upright tablet (the 2D version, which shows only the part of a step a flat packshot
+     shows) it is 800 vh: one swap takes 54 vh, about 1.1 px of cloth per px of scroll. -->
+<section class="lx lx--ten" id="ten" data-hold="1700" data-hold-narrow="800" aria-labelledby="ten-h">
+  <h2 class="sr-only" id="ten-h">Edition One: ten bottles, in the order of the spectrum</h2>
+  <ol class="sr-only" id="tenList"><!-- js/landing/ten.js: one item per edition --></ol>
+  <div class="lx__stage" id="tenStage">
+    <div class="tf tf--a" data-edition="01" aria-hidden="true"></div>
+    <div class="tf tf--b" data-edition="02" aria-hidden="true"></div>
+    <div class="tf__drops" aria-hidden="true"><i class="tf__drop tf__drop--a"></i><i class="tf__drop tf__drop--b"></i></div>
+    <div class="tf__pks" aria-hidden="true">
+      <img class="lx__pk tf__pk tf__pk--a" alt="" width="720" height="971">
+      <img class="lx__pk tf__pk tf__pk--b" alt="" width="720" height="971">
+    </div>
+    <div class="tf__cloths" aria-hidden="true">
+      <img class="tf__cloth tf__cloth--a" alt="" width="1448" height="1086">
+      <img class="tf__cloth tf__cloth--b" alt="" width="1448" height="1086">
+    </div>
+    <!-- the cursor's hit-proxy over the standing bottle (js/landing/ten.js sizes it and keeps its label);
+         live only while a step is at rest -->
+    <i class="bhit" aria-hidden="true" data-cursor="NO. 01 · PATTACHITRA" data-cursor-coin="01"></i>
+  </div>
+</section>
+
+<!-- L4. Twenty-four hours (Kajal, with No. 07 Lippan: white relief on sky blue and its polished mirrors,
+     cold, and it holds the dark; the ten designs end on pink, so this chapter has its own ground): the
+     bottle comes apart to show why it keeps water cold, with the five parts labelled level with each
+     part. The readout is the chapter's display type. On a phone (and with no WebGL) the same story is told by
+     pictures of the bottle's parts (js/landing/hours.js, assets/img/hours-*.webp), over data-hold-narrow. -->
+<section class="lx lx--hours" id="hours" data-ground="kajal" data-hold="150" data-hold-narrow="360" aria-labelledby="hours-h">
+  <div class="lx__stage" id="hoursStage">
+    <div class="readout">
+      <p class="t-label readout__when">09:00, the next morning</p>
+      <dl class="readout__cols">
+        <div class="readout__col"><dt class="t-label">In the glass</dt><dd class="readout__fig">28°C</dd></div>
+        <div class="readout__col"><dt class="t-label">In the bottle</dt><dd class="readout__fig">9°C</dd></div>
+      </dl>
+    </div>
+    <div class="lx__words hours__words">
+      <p class="t-label">Ahmedabad, May.</p>
+      <h2 class="t-h3 hours__claim" id="hours-h">Ice water in at nine in the morning. Still cold at nine the next morning.</h2>
+      <p class="t-small hours__note">Hours measured with iced or boiling water, lid closed, at a room temperature of 25°C. The day shown above is an illustration.</p>
+    </div>
+    <ul class="parts" id="parts" aria-label="Inside the bottle">
+      <li class="part t-small"><i class="part__tick" aria-hidden="true"></i><span>Brass cap, steel inner</span></li>
+      <li class="part t-small"><i class="part__tick" aria-hidden="true"></i><span>Inner wall, 18/8 steel</span></li>
+      <li class="part t-small"><i class="part__tick" aria-hidden="true"></i><span>Vacuum</span></li>
+      <li class="part t-small"><i class="part__tick" aria-hidden="true"></i><span>Painted band, 180 mm tall, all the way round</span></li>
+      <li class="part t-small"><i class="part__tick" aria-hidden="true"></i><span>Outer wall, 18/8 steel</span></li>
+    </ul>
+    <i class="lx__shadow" aria-hidden="true"></i>
+    <img class="lx__pk hours__pk" data-src="assets/img/bottle-07.webp" alt="" aria-hidden="true" width="720" height="980">
+    <p class="t-label lx__cap">No. 07 · Lippan · Aasmani</p>
+  </div>
+</section>
+
+<!-- L5. Out in the world (Jamun): seven clips of ordinary days, one at a time, each rising into the
+     window under a straight line. The honesty line under the window never moves. -->
+<section class="lx lx--world" id="world" data-edition="09" data-hold="110" aria-labelledby="world-h">
+  <div class="lx__stage" id="worldStage">
+    <div class="lx__words world__words">
+      <h2 class="t-h2" id="world-h">Out in the world.</h2>
+      <ol class="cliplist" id="clipList" aria-hidden="true"><!-- js/landing/world.js: the seven, in time order --></ol>
+      <div class="clipcap" aria-live="polite">
+        <p class="t-label" id="clipWhen">06:12 · 1 / 7</p>
+        <p class="t-small" id="clipWhere">Churchgate local, Mumbai</p>
+        <p class="t-small" id="clipWhich">Neel · No. 08 Ajrakh</p>
+      </div>
+      <button class="link t-button hit clips__pause" id="clipsPause" type="button" data-cursor="PAUSE">Pause the clips</button>
+      <p class="sr-only" id="clipsStatus" role="status"></p>
+    </div>
+    <div class="world__win">
+      <div class="clipwin" id="clipWindow" tabindex="0" role="group" aria-label="Seven clips, one at a time">
+        <video class="clip" muted playsinline loop preload="none" data-clip="u-01-neel" data-poster="assets/video/u-01-neel.webp" aria-label="Clip 1 of 7: 06:12, Churchgate local, Mumbai. The bottle is No. 08 Ajrakh, Ajrakhpur and Dhamadka, Kutch, in Neel."></video>
+        <video class="clip" muted playsinline loop preload="none" data-clip="u-02-popati" data-poster="assets/video/u-02-popati.webp" aria-label="Clip 2 of 7: 06:40, Marine Drive, Mumbai. The bottle is No. 04 Patola, Patan, Gujarat, in Popati."></video>
+        <video class="clip" muted playsinline loop preload="none" data-clip="u-03-jamun" data-poster="assets/video/u-03-jamun.webp" aria-label="Clip 3 of 7: 07:05, A rooftop, Udaipur. The bottle is No. 09 Kalamkari, Machilipatnam and Pedana, Andhra Pradesh, in Jamun."></video>
+        <video class="clip" muted playsinline loop preload="none" data-clip="u-04-morpankhi" data-poster="assets/video/u-04-morpankhi.webp" aria-label="Clip 4 of 7: 09:05, A desk in Bengaluru. The bottle is No. 06 Gond, Patangarh, Madhya Pradesh, in Morpankhi."></video>
+        <video class="clip" muted playsinline loop preload="none" data-clip="u-05-haldi" data-poster="assets/video/u-05-haldi.webp" aria-label="Clip 5 of 7: 11:30, College canteen, Pune. The bottle is No. 03 Madhubani, Mithila, Bihar, in Haldi."></video>
+        <video class="clip" muted playsinline loop preload="none" data-clip="u-06-geru" data-poster="assets/video/u-06-geru.webp" aria-label="Clip 6 of 7: 16:45, Monsoon afternoon, Kochi. The bottle is No. 02 Warli, Palghar and Thane, Maharashtra, in Geru."></video>
+        <video class="clip" muted playsinline loop preload="none" data-clip="u-07-aasmani" data-poster="assets/video/u-07-aasmani.webp" aria-label="Clip 7 of 7: 18:20, The white Rann, Kutch. The bottle is No. 07 Lippan, Kutch, Gujarat, in Aasmani."></video>
+      </div>
+      <p class="t-small honesty">Illustrative clips made with AI for this concept. The people shown are not customers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- L6. The shop, a separate calm part: the ten in a row on one line, and the way into the shop -->
+<section class="lx lx--shop paper" id="shopPart" data-ground="chuna" aria-labelledby="shop-h">
+  <div class="shop__head">
+    <div class="shop__words">
+      <p class="t-label">Edition One</p>
+      <h2 class="t-display shop__title" id="shop-h"><span>Choose a colour.</span> <span>Carry it.</span></h2>
+    </div>
+    <div class="shop__go">
+      <p class="t-small">All ten, in a sheesham case — ₹46,000</p>
+      <a class="btn btn--kajal" href="shop.html"><span>Shop Edition One</span></a>
+    </div>
+  </div>
+  <ol class="row" id="shopRow"><!-- js/landing/row.js: the ten packshots on one line --></ol>
+</section>
+
+</main>
+
+<!-- the shared footer (Kajal): js/shop/chrome.js fills it -->
+<footer id="siteFooter"></footer>
+
+<script src="js/vendor/gsap-3.15.0-gsap.min.js"></script>
+<script src="js/vendor/gsap-3.15.0-ScrollTrigger.min.js"></script>
+<script src="js/vendor/gsap-3.15.0-CustomEase.min.js"></script>
+<script src="js/vendor/lenis-1.3.26.min.js"></script>
+<script type="module" src="js/landing/main.js"></script>
+</body>
+</html>

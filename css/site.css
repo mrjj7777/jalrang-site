@@ -1,0 +1,387 @@
+/* JALRANG — the shared layer, linked by every page after css/fonts.css (16 October 2026).
+   Tokens, base, type, controls, form fields, the header, the menu, the toast and the footer.
+   A page's own sections live in its own sheet (shop.html: css/main.css; the others: css/<page>.css).
+   Values come from the redesign spec (15 October 2026) and ARCH.md (16 October 2026). */
+
+/* ========== 1. Tokens ========== */
+:root {
+  --chuna: #F7F2E8; --kajal: #1A1612; --soot: #5B524A; --mist: #ECE5D8;
+  --ground: var(--chuna); --deep: var(--mist); --text: var(--kajal); --tint: var(--mist); --accent: var(--kajal);
+  --rule: rgba(26, 22, 18, 0.24);   /* a 1 px hairline on Chuna */
+  --error: #8E2410;                  /* deep Sindoor: form errors on Chuna (7.9:1) */
+
+  /* the only places a family is named: swap a font here and nowhere else */
+  --f-display: 'Jaini', 'Mukta', serif;
+  --f-text: 'Mukta', 'Segoe UI', system-ui, sans-serif;
+  --f-deva: 'Jaini', 'Mukta', serif;   /* जलरंग is drawn in Jaini itself, with the same pen as the Latin */
+
+  /* type scale (sizes at 1505 / 390). Jaini only at 52 px or more (the logo is the one exception). */
+  --t-display: clamp(60px, 30px + 4.4vw, 112px);
+  --t-h2: clamp(52px, 40px + 2.4vw, 80px);   /* Jaini is wide: 76 at 1505 */
+  --t-h3: clamp(26px, 21.1px + 1.26vw, 44px);
+  --t-lead: clamp(18px, 16.9px + 0.29vw, 22px);
+  --t-body: clamp(17px, 16.6px + 0.1vw, 18px);
+  --t-small: clamp(14px, 13.6px + 0.1vw, 15px);
+  --t-figure: clamp(44px, 18px + 4.67vw, 96px);
+  --t-nav-mark: clamp(26px, 24.6px + 0.36vw, 30px);
+
+  /* grid and spacing: 12 columns, 72 px margins at 1505 */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --s7: 48px; --s8: 72px; --s9: 112px; --s10: 168px; --s11: 256px;
+  --margin: 72px; --gutter: 24px; --gap-block: 24px;
+  --nav-h: 72px;
+
+  /* motion: the three eases (also registered for GSAP as 'flow', 'tide', 'settle' by chrome.js) */
+  --ease-flow: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-tide: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-settle: cubic-bezier(0.33, 1, 0.68, 1);
+  --d-instant: 140ms; --d-quick: 280ms; --d-swap: 200ms; --d-base: 560ms; --d-open: 700ms; --d-opening: 900ms;
+
+  /* the header's ink and band. Every page but the shop sits on Chuna; a page on another ground sets
+     these two on :root (the shop's worlds engine sets them per frame from whatever lies under the bar) */
+  --nav-ink: #1A1612; --nav-ground: #F7F2E8;
+}
+@media (max-width: 1279px) { :root { --margin: 48px; } }
+/* narrow (a phone, a tablet held upright, or a window the fixed frames do not fit): html.is-narrow, set by js/core/env.js (NARROW) */
+:root:where(.is-narrow) { --margin: 24px; --gutter: 16px; --nav-h: 56px; }
+/* compact laptop screens: the type steps down so one idea still fits one screen */
+@media (min-width: 768px) and (max-height: 820px) {
+  :root { --t-h2: 60px; --t-h3: 30px; --t-lead: 17px; --t-body: 16px; --gap-block: 16px; }
+}
+
+/* the ten grounds, plus Chuna and Kajal: any element carrying data-edition="NN" or data-ground
+   takes that edition's colours for itself and everything inside it
+   (--hover-ink: the label of a primary button while its fill rises, set where the ground colour would fall under 4.5:1 on it) */
+[data-edition="01"] { --ground:#C3361D; --deep:#7A1D0C; --text:#F7F2E8; --tint:#F6DCD1; --accent:#F2B22E; --hover-ink:var(--deep); }
+[data-edition="02"] { --ground:#E07326; --deep:#8E3F0E; --text:#1E0E05; --tint:#FBE3D0; --accent:#F7F2E8; }
+[data-edition="03"] { --ground:#F0B323; --deep:#B37C05; --text:#3A2402; --tint:#FCEDC4; --accent:#C3286E; }
+[data-edition="04"] { --ground:#78B23E; --deep:#3E6C1B; --text:#14290A; --tint:#E4F0D4; --accent:#C3262E; }
+[data-edition="05"] { --ground:#0D7A52; --deep:#064A31; --text:#F7F2E8; --tint:#D3EBDF; --accent:#EC97A6; --hover-ink:var(--deep); }
+[data-edition="06"] { --ground:#0A7078; --deep:#054349; --text:#F7F2E8; --tint:#D2ECEE; --accent:#F2B22E; --hover-ink:var(--deep); }
+[data-edition="07"] { --ground:#4A9BD8; --deep:#1F5E91; --text:#0B1E33; --tint:#DCEBF7; --accent:#F7F2E8; --hover-ink:var(--tint); }
+[data-edition="08"] { --ground:#26338A; --deep:#141C52; --text:#E7E9F5; --tint:#DCDFF2; --accent:#B3302C; }
+[data-edition="09"] { --ground:#6B2D7A; --deep:#3E1647; --text:#F7F2E8; --tint:#EBDCEF; --accent:#E2A93B; }
+[data-edition="10"] { --ground:#C3286E; --deep:#7A1443; --text:#F7F2E8; --tint:#F8DAE7; --accent:#F6C443; --hover-ink:var(--deep); }
+[data-ground="chuna"] { --ground:#F7F2E8; --deep:#ECE5D8; --text:#1A1612; --tint:#ECE5D8; --accent:#1A1612; --hover-ink:var(--ground); }
+[data-ground="kajal"] { --ground:#1A1612; --deep:#2A2622; --text:#F7F2E8; --tint:#2A2622; --accent:#F7F2E8; --hover-ink:var(--ground); }
+
+/* ========== 2. Base ========== */
+*, *::before, *::after { box-sizing: border-box; }
+/* The scrollbar is never hidden (no overflow change while a dialog is open, no gutter tricks): the page behind a dialog is held still by
+   js/shop/chrome.js, which stops the wheel, touch and scroll keys instead. */
+html { -webkit-text-size-adjust: 100%; scroll-behavior: auto; background: var(--chuna); font-synthesis: none; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+[data-lenis-prevent] { overscroll-behavior: contain; }
+body {
+  margin: 0; background: var(--chuna); color: var(--kajal); overflow-x: clip;
+  font-family: var(--f-text); font-size: var(--t-body); line-height: 1.55; font-weight: 400;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+img, video, svg, canvas { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
+input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3, p, ol, ul, dl, dd, figure, table { margin: 0; }
+h1, h2, h3, th { font-weight: inherit; }   /* weights come from the type classes; nothing asks for Mukta 700 */
+ol, ul { padding: 0; list-style: none; }
+::selection { background: var(--kajal); color: var(--chuna); }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+main:focus { outline: none; }
+[tabindex="-1"]:focus { outline: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip-link { position: fixed; left: var(--s4); top: var(--s4); z-index: 100; background: var(--kajal); color: var(--chuna); padding: var(--s3) var(--s4); min-height: 44px; display: inline-flex; align-items: center; text-decoration: none; transform: translateY(-200%); }
+.skip-link:focus { transform: none; }
+/* no JavaScript, or the page could not start: one calm message in place of a blank page */
+.noscript { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 24px; background: var(--chuna); color: var(--kajal); text-align: center; }
+.noscript p { max-width: 34ch; margin: 0; font: 500 1.125rem/1.5 Mukta, system-ui, sans-serif; }
+/* Chuna is hand-made paper, never flat digital white: a fine grain at 4% */
+.paper { background-color: var(--chuna); background-image: var(--grain); }
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .32 0 0 0 0 .26 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+
+/* ========== 3. Type ========== */
+/* Jaini (Ek Type), the display face: one weight (400), never synthesised, set as written in the HTML,
+   tracking -0.01em, leading 0.92 on more than one line, and only at 52 px or more (the logo is the
+   one exception). Mukta (Ek Type): everything long or small, every label, button, price (₹) and figure. */
+.wordmark, .t-display, .t-h2, .t-num {
+  font-family: var(--f-display); font-weight: 400; font-style: normal; text-transform: none;
+  font-variant-numeric: lining-nums; font-kerning: normal; font-feature-settings: 'kern' 1, 'liga' 1; word-spacing: 0.05em;
+}
+.wordmark { line-height: 1; letter-spacing: 0; }
+.wordmark--nav { font-size: var(--t-nav-mark); letter-spacing: 0.02em; }
+.t-display { font-size: var(--t-display); line-height: 0.92; letter-spacing: -0.01em; text-wrap: balance; }
+.t-h2 { font-size: var(--t-h2); line-height: 0.92; letter-spacing: -0.01em; text-wrap: balance; }
+.t-num { font-size: var(--t-display); line-height: 1; }
+.t-h3 { font-family: var(--f-text); font-weight: 500; font-size: var(--t-h3); line-height: 1.12; letter-spacing: -0.01em; text-transform: none; text-wrap: balance; }
+.t-lead { font-family: var(--f-text); font-weight: 400; font-size: var(--t-lead); line-height: 1.45; letter-spacing: 0; }
+.t-body { font-family: var(--f-text); font-weight: 400; font-size: var(--t-body); line-height: 1.55; letter-spacing: 0; }
+.t-small { font-family: var(--f-text); font-weight: 400; font-size: var(--t-small); line-height: 1.45; letter-spacing: 0.005em; }
+.t-label { font-family: var(--f-text); font-weight: 600; font-size: 12px; line-height: 1.2; letter-spacing: 0.12em; text-transform: uppercase; }
+.t-nav { font-family: var(--f-text); font-weight: 500; font-size: 15px; line-height: 1; letter-spacing: 0.005em; }
+.t-button { font-family: var(--f-text); font-weight: 600; font-size: 15px; line-height: 1; letter-spacing: 0.01em; }
+.t-price { font-family: var(--f-text); font-weight: 500; font-size: 22px; line-height: 1; font-variant-numeric: proportional-nums lining-nums; }
+.t-fig { font-family: var(--f-text); font-weight: 500; font-size: var(--t-figure); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: proportional-nums lining-nums; }
+.t-fig .dg { display: inline-block; width: 1ch; text-align: center; }   /* one span per digit, so rolling digits never shift */
+.deva { font-family: var(--f-deva); font-weight: 400; line-height: 1; letter-spacing: 0; }
+
+/* ========== 4. Controls ========== */
+/* primary: a 56 px pill, fill --text, label --ground; on hover a fill rises from the bottom */
+.btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; height: 56px; padding: 0 28px;
+  border-radius: 999px; background: var(--text); color: var(--ground); text-decoration: none; white-space: nowrap; overflow: hidden;
+  font-family: var(--f-text); font-weight: 600; font-size: 15px; line-height: 1; letter-spacing: 0.01em;
+  transition: transform var(--d-instant) var(--ease-settle);
+  isolation: isolate;
+}
+.btn::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--text) 84%, var(--ground));
+  clip-path: inset(100% 0 0 0); transition: clip-path var(--d-quick) var(--ease-tide);
+}
+.btn:hover::before { clip-path: inset(0 0 0 0); }
+/* the risen fill is 84 % of --text, a little nearer the ground: on five grounds the ground-coloured label would then fall under 4.5:1, so it takes --hover-ink (the others keep it) */
+.btn:where(:not(.btn--kajal, .btn--chuna, .btn--line)):hover { color: var(--hover-ink, var(--ground)); }
+.btn:active { transform: scale(0.98); }
+.btn:focus-visible { outline-color: var(--text); }
+.btn:disabled, .btn[aria-disabled="true"] { cursor: default; opacity: 1; background: var(--soot); color: var(--chuna); }
+.btn:disabled::before, .btn[aria-disabled="true"]::before { display: none; }
+.btn--kajal { background: var(--kajal); color: var(--chuna); }
+.btn--kajal::before { background: #3A332C; }
+.btn--kajal:focus-visible { outline-color: var(--kajal); }
+.btn--chuna { background: var(--chuna); color: var(--kajal); }
+.btn--chuna::before { background: #E2DACB; }
+.btn--chuna:focus-visible { outline-color: var(--chuna); }
+/* the quiet twin: a 1 px ring in the text colour, the same 56 px pill */
+.btn--line { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px currentColor; }
+.btn--line::before { background: var(--text); }
+.btn--line:hover { color: var(--ground); }
+.btn--line > * { position: relative; }
+.btn--wide { width: 100%; }
+/* Windows high contrast: a background fill is not drawn, so the pill keeps a border and stays a button */
+@media (forced-colors: active) { .btn { border: 1px solid ButtonText; } }
+/* text link: 1 px underline at 4 px, 2 px on hover */
+.link { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.link:hover { text-decoration-thickness: 2px; }
+/* a text link or text button that keeps a 44 px hit area without moving the lines around it */
+.hit { position: relative; }
+.hit::after { content: ''; position: absolute; left: 50%; top: 50%; width: max(calc(100% + 8px), 44px); height: 44px; transform: translate(-50%, -50%); }
+.arrow { display: inline-block; width: 18px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: square; vertical-align: middle; }
+.arrow--l { margin-right: 8px; } .arrow--r { margin-left: 8px; }
+.chip { display: inline-block; width: 12px; height: 12px; background: var(--chip, var(--kajal)); box-shadow: inset 0 0 0 1px rgba(26, 22, 18, 0.35); flex: none; }
+.chip--ten { background: conic-gradient(#C3361D 0 36deg, #E07326 0 72deg, #F0B323 0 108deg, #78B23E 0 144deg, #0D7A52 0 180deg, #0A7078 0 216deg, #4A9BD8 0 252deg, #26338A 0 288deg, #6B2D7A 0 324deg, #C3286E 0); }
+
+/* ========== 5. Form fields ========== */
+/* a label (t-label) over a 56 px box with a 1 px line in the text colour; no rounded corners.
+   <label class="field"><span class="t-label">Email</span><input type="email"></label>
+   An error: aria-invalid="true" on the input (2 px line) and a .field__msg under it. */
+.field { display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+.field input, .field select, .field textarea { width: 100%; height: 56px; padding: 0 var(--s4); border: 1px solid currentColor; border-radius: 0; background: transparent; appearance: none; }
+.field textarea { height: auto; min-height: 112px; padding: var(--s3) var(--s4); resize: vertical; }
+.field select { padding-right: 44px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231A1612' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline-offset: 2px; }
+.field input[aria-invalid="true"], .field select[aria-invalid="true"], .field textarea[aria-invalid="true"] { border: 2px solid var(--error); }
+/* an error reads as one: the line in a deep Sindoor (9:1 on Chuna), its words in it at 600, set
+   4 px clear of the hint above */
+.field__msg { font-size: var(--t-small); line-height: 1.45; min-height: 0; color: var(--error); font-weight: 600; margin-top: 4px; }
+.field__msg:empty { display: none; }
+.field__hint { font-size: var(--t-small); line-height: 1.45; color: inherit; }
+/* a radio or checkbox row, 44 px tall */
+.check { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 0; accent-color: var(--kajal); flex: none; }
+/* the quantity stepper: − n +, three 44 px squares */
+.qty { display: grid; grid-template-columns: 44px 44px 44px; grid-template-rows: auto 44px; row-gap: 8px; align-items: center; }
+.qty__label { grid-column: 1 / -1; }
+.qty--bare { grid-template-rows: 44px; }
+/* − n + sit in one pill track, the corner language of every button on the site */
+.qty { position: relative; }
+.qty::after { content: ''; position: absolute; left: 0; bottom: 0; width: 132px; height: 44px; box-sizing: border-box; border: 1px solid currentColor; border-radius: 999px; pointer-events: none; }
+.qty__b { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 50%; }
+.qty__b:hover:not(:disabled) { background: color-mix(in srgb, currentColor 10%, transparent); }
+.qty__b svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.qty__b:disabled { cursor: default; color: var(--soot); }
+.qty__n { text-align: center; font-variant-numeric: proportional-nums lining-nums; }
+
+/* ========== 6. Layers ========== */
+.nav { z-index: 50; }
+.toast { z-index: 65; }
+.menu { z-index: 70; }
+
+/* ========== 7. Header (built by js/shop/chrome.js into <header id="siteHeader">) ========== */
+/* fixed, 72 px (56 on a phone), the margins of the grid. Its ink is --nav-ink; the band behind it
+   (--nav-ground) shows while html.nav-band is set (chrome.js keeps it on, except where the page
+   manages it: the shop's worlds engine) */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); padding: 0 var(--margin);
+  display: flex; align-items: center; justify-content: space-between; color: var(--nav-ink);
+}
+.nav::before { content: ''; position: absolute; inset: 0; background: var(--nav-ground); opacity: 0; pointer-events: none; }
+.nav-band .nav::before { opacity: 1; }
+/* html.nav-grain (chrome.js, on every page whose band it keeps): the band is the same paper as the page */
+.nav-grain .nav::before { background-image: var(--grain); }
+.nav__left, .nav__right { position: relative; display: flex; align-items: center; }
+/* the logo may take its own ink (the landing's ten designs, where a colour line crosses the bar) */
+.nav__left { color: var(--nav-ink-l, var(--nav-ink)); }
+/* the lockup (Jaini JALRANG + जलरंग) sits on one baseline */
+.nav__left { align-items: baseline; }
+.nav__lockup { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; padding-block: 9px;
+  transition: opacity var(--d-quick) var(--ease-tide), visibility 0s; }
+/* html.mark-managed: the lockup waits for html.nav-mark (the shop shows it once its hero mark has gone) */
+.mark-managed:not(.nav-mark) .nav__lockup { opacity: 0; visibility: hidden;
+  transition: opacity var(--d-quick) var(--ease-tide), visibility 0s linear var(--d-quick); }
+.nav__deva { font-size: calc(var(--t-nav-mark) * 0.65); }
+.nav__right { gap: 32px; }
+.nav__link { position: relative; text-decoration: none; padding: 14.5px 6px; margin: 0 -6px; min-width: 44px; text-align: center; white-space: nowrap; }   /* 44 px tall targets */
+/* the rule under a link is drawn, not a text decoration, so it runs unbroken under "Bag (n)" (whose
+   rolling digit is an inline-block): 1 px on hover, drawn from the left; 1.5 px under the page you
+   are on (or its section: a product is in the Shop, the checkout in the Bag) */
+.nav__link::after { content: ''; position: absolute; left: 6px; right: 6px; bottom: 9px; height: 1px; background: currentColor;
+  transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--d-quick) var(--ease-flow); }
+.nav__link:hover::after { transform: scaleX(1); }
+.nav__link[aria-current]::after { height: 1.5px; transform: scaleX(1); }
+/* Windows high contrast: a background is not drawn, so the bar under the hovered and the current header link vanished and the current page was
+   not marked; it is drawn in the text colour, as pages.css does for the tab, step and ten-line bars */
+@media (forced-colors: active) { .nav__link::after { background: CanvasText; forced-color-adjust: none; } }
+.nav__count { display: inline-block; overflow: hidden; vertical-align: top; line-height: 1; }
+.nav__count > span { display: inline-block; }
+.nav__menu { width: 44px; height: 44px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; }
+.nav__menu i { display: block; width: 16px; height: 6.5px; border-top: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; }
+/* the menu button is a phone control; a page that has more to offer on a wide screen (the shop:
+   its chapters, sound and motion) keeps it with html.menu-wide */
+html:not(.is-narrow):not(.menu-wide) .nav__menu { display: none; }
+:where(.is-narrow) .nav__wide { display: none; }
+:where(.is-narrow) .nav__right { gap: 20px; }
+
+/* ========== 8. Menu (chrome.js: #siteMenu, a dialog on Chuna paper) ========== */
+/* the four pages in Jaini, each line rising from its own mask; under them (or beside them on a wide
+   screen) what the page adds: the shop's chapters and its sound and motion choices */
+.menu { position: fixed; inset: 0; --ground: var(--chuna); color: var(--kajal); display: flex; flex-direction: column; padding: 0 var(--margin) 32px; overflow: auto; }
+.menu__top { height: var(--nav-h); display: flex; align-items: center; justify-content: space-between; flex: none; }
+.menu__lockup { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; padding-block: 9px; }   /* 44 px tall, the glyphs where the header's are */
+.menu__close { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: flex-end; }
+.menu__body { margin-top: 5vh; flex: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-content: start; }
+.menu__nav { grid-column: 1 / span 7; }
+.menu__list { display: flex; flex-direction: column; gap: 8px; }
+/* each link is its own line mask: the caps and the J's hook stay inside it while the line rises */
+.menu__link { display: inline-block; text-decoration: none; overflow: hidden; padding: 0.08em 0 0.2em; margin: -0.04em 0 -0.16em; }
+.menu__link > span { display: inline-block; }
+.menu__link .nav__count { display: inline; overflow: visible; }   /* one line of text, so the rule runs under it */
+/* the rule is drawn on the inner line (a decoration does not reach into an inline-block) */
+.menu__link:hover > span, .menu__link[aria-current] > span { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
+.menu__extra { grid-column: 9 / span 4; padding-top: 12px; }
+.menu__extra:empty { display: none; }
+.menu__extra .t-label + * { margin-top: 16px; }
+.menu__sub { display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
+.menu__sub a { display: flex; align-items: center; min-height: 48px; border-bottom: 1px solid var(--rule); text-decoration: none; }
+.menu__sub a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.menu__foot { display: flex; flex-wrap: wrap; gap: 8px 32px; padding-top: 24px; }
+.menu__foot:empty { display: none; }
+.menu__foot .link { min-height: 44px; display: inline-flex; align-items: center; }
+:where(.is-narrow) .menu__body { display: block; }
+:where(.is-narrow) .menu__extra { margin-top: 48px; padding-top: 0; }
+
+/* ========== 9. Toast (chrome.js): a Kajal plate under "Bag", revealed by a line from the bottom ========== */
+.toast { position: fixed; top: calc(var(--nav-h) + 16px); right: var(--margin); max-width: 400px; padding: 16px; background: var(--kajal); color: var(--chuna); }
+.toast__view { margin-left: 8px; font-weight: 600; white-space: nowrap; }
+:where(.is-narrow) .toast { left: var(--margin); max-width: none; top: calc(var(--nav-h) + 12px); }
+
+/* ========== 10. Footer (chrome.js fills <footer id="siteFooter">; Kajal) ========== */
+/* chrome.js gives the element data-ground="kajal", so it takes Kajal's tokens */
+.footer { position: relative; background: var(--ground); color: var(--text); padding: var(--s9) var(--margin) var(--s7); container-type: inline-size; }
+/* the wordmark lockup on one baseline: JALRANG, then जलरंग at 0.65 of it, fitted so the lockup's ink
+   runs from margin to margin (chrome.js measures the real glyphs; this is the first-paint value),
+   never taller than half the screen. Each part rises in its own mask. */
+.footer__mark { --wm: min(calc((100cqw - 2 * var(--margin)) / 3.25), 50vh); display: flex; align-items: baseline; flex-wrap: nowrap; column-gap: calc(var(--wm) * 0.24); margin: 0; }
+.footer__word { display: block; font-size: var(--wm); margin-left: var(--fw-x, 0px); }
+.footer__deva { display: block; font-size: calc(var(--wm) * 0.65); }
+.footer__mask { display: block; flex: none; overflow: hidden; padding: calc(var(--wm) * 0.14) calc(var(--wm) * 0.08) calc(var(--wm) * 0.2); margin: calc(var(--wm) * -0.14) calc(var(--wm) * -0.08) calc(var(--wm) * -0.2); }   /* room for Jaini's G and J, whose ink runs past their advance */
+.footer__cols { margin-top: var(--s9); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: start; }
+.footer__pass { grid-column: 1 / span 4; }
+.footer__pass > p { margin-top: 12px; }
+/* the Passport: fields → 16 → "Issue my passport" → 12 → the message → the note */
+.footer__form { margin-top: 24px; display: flex; flex-direction: column; align-items: stretch; }
+.footer__form > * + * { margin-top: 16px; }
+.footer__form .btn { align-self: flex-start; }
+/* the "(optional)" in the Name label: sentence case, small and light, on the label's own line (the same look as the checkout's .field__opt) */
+.footer__form .t-label .t-small { font-weight: 400; letter-spacing: 0.04em; text-transform: none; font-size: 13px; line-height: 1; margin-left: 6px; }
+.footer__msg { margin-top: 12px; min-height: 1.45em; }
+.footer__form > .footer__note { margin-top: 4px; }
+.footer__nav { grid-column: 6 / span 3; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; margin-top: -14.5px; }
+.footer__nav a { text-decoration: none; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; }   /* 44 px targets on a 47 px pitch */
+.footer__nav a:hover, .footer__nav a[aria-current] { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.footer__jj { grid-column: 10 / span 3; }
+.footer--lean .footer__nav { grid-column: 1 / span 3; }
+.footer--lean .footer__jj { grid-column: 5 / span 4; }
+.footer__legal { margin-top: var(--s9); max-width: 68ch; }
+.footer__legal > * + * { margin-top: 16px; }
+:where(.is-narrow) .footer__cols { grid-template-columns: 1fr; row-gap: 48px; }
+:where(.is-narrow) .footer--lean .footer__nav, :where(.is-narrow) .footer--lean .footer__jj { grid-column: 1; }
+:where(.is-narrow) .footer__pass, :where(.is-narrow) .footer__nav, :where(.is-narrow) .footer__jj { grid-column: 1; }
+
+/* ========== 11. The page skeleton (product, bag, account, checkout, landing) ========== */
+/* <main id="main" class="page"> starts under the fixed header; .wrap is the 12-column grid between
+   the margins; .rule is a 1 px hairline in the text colour */
+.page { position: relative; min-height: 100svh; padding-top: var(--nav-h); background-color: var(--ground); color: var(--text); }   /* background-color: .paper keeps its grain */
+.wrap { padding: 0 var(--margin); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); }
+:where(.is-narrow) .wrap { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rule { border: 0; height: 1px; margin: 0; background: color-mix(in srgb, var(--text) 24%, transparent); }
+
+/* ========== 12. Reduced motion ========== */
+@media (prefers-reduced-motion: reduce) {
+  .btn, .btn::before, .nav__lockup, .nav__link::after { transition: none; }
+}
+.is-calm *, .is-calm *::before, .is-calm *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+
+/* ========== 13. Cursor (js/shop/cursor.js: the API and the data attributes are in its header) ========== */
+/* A drop that follows the pointer, a pill that pops up beside it over buttons and bottles (a label, and
+   for a bottle a round painting chip), and two thin rings on a click. js/shop/cursor.js adds html.has-cursor
+   at the first real pointer move and never before, so without it (no JS, a failed start, touch, a calm
+   page, forced colours) nothing below applies and the system cursor stays. The colours come from the page:
+   --cur-ink is the text colour of what lies under the pointer, --cur-ground the ground behind it and
+   --cur-label the pill's ink (the script sets all three). No blend mode. */
+html.has-cursor, html.has-cursor * { cursor: none !important; }
+html.has-cursor :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="image"]):not([type="color"]):not([type="file"]), textarea, select, [contenteditable=""], [contenteditable="true"], video[controls]) { cursor: auto !important; }
+.cursor {
+  --cur-ink: var(--kajal); --cur-ground: var(--chuna); --cur-label: var(--chuna);
+  position: fixed; left: 0; top: 0; z-index: 100; width: 0; height: 0; pointer-events: none; contain: layout style; will-change: transform;
+  opacity: 0; transition: opacity var(--d-quick) linear;
+}
+.cursor.is-on { opacity: 1; }
+.cursor.is-native, .cursor.is-typing, .cursor.is-bar { opacity: 0; transition-duration: var(--d-instant); }   /* over a text field or the scrollbar the system cursor shows */
+/* the drop: 14 × 18, round at the bottom and pointed at the top. Its hot spot is the middle of the round
+   part, which is also what turns and stretches along the way it travels (cursor.js) */
+.cursor__stretch { position: absolute; left: -7px; top: -11px; width: 14px; height: 18px; transform-origin: 7px 11px; }
+.cursor__drop { display: block; overflow: visible; transform-origin: 7px 11px; transform: scale(0.6); transition: transform var(--d-quick) var(--ease-flow); }
+.cursor.is-on .cursor__drop { transform: none; }
+.cursor.is-hot .cursor__drop { transform: scale(1.3); }      /* over something to press that has no label */
+.cursor.is-down .cursor__drop { transform: scale(0.8); }
+.cursor__drop path { fill: var(--cur-ink); stroke: var(--cur-ground); stroke-width: 2px; stroke-linejoin: round; paint-order: stroke; transition: fill 180ms linear, stroke 180ms linear; }
+/* the pill: a label, and for a bottle the round painting chip first. It sits 20 px off the pointer and,
+   near the right edge, on its left. It pops up: from the drop, scale 0.6 → 1 and a 6 px rise, 280 ms, 'flow' */
+.cursor__pill {
+  --dx: 20px; --dy: 0px;
+  position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 13px; border-radius: 999px; white-space: nowrap;
+  background: var(--cur-ink); color: var(--cur-label); box-shadow: 0 0 0 1.5px var(--cur-ground);
+  font: 600 12px/1 var(--f-text); letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0; transform: translate(var(--dx), calc(-50% + var(--dy) + 6px)) scale(0.6); transform-origin: 0 50%;
+  transition: opacity 120ms linear, transform 180ms var(--ease-flow), background-color 180ms linear, color 180ms linear, box-shadow 180ms linear;
+}
+.cursor.is-label .cursor__pill {
+  opacity: 1; transform: translate(var(--dx), calc(-50% + var(--dy))) scale(1);
+  transition: opacity 140ms linear, transform var(--d-quick) var(--ease-flow), background-color 180ms linear, color 180ms linear, box-shadow 180ms linear;
+}
+.cursor.is-label.is-down .cursor__pill { transform: translate(var(--dx), calc(-50% + var(--dy))) scale(0.96); }
+.cursor.is-low .cursor__pill { --dy: 30px; }   /* in the header: under the pointer, clear of the next link */
+/* a pill that is about to pop up takes the colours of its ground at once (cursor.js sets .is-snap for one frame) */
+.cursor.is-snap .cursor__pill { transition: opacity 140ms linear, transform var(--d-quick) var(--ease-flow); }
+.cursor.is-snap .cursor__coin { transition: none; }
+.cursor__pill.has-coin { height: 32px; padding: 0 14px 0 5px; }
+.cursor__label { margin-right: -0.1em; }   /* the last letter's tracking is not padding */
+.cursor__coin { flex: none; display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--coin-bg, var(--cur-label)) center / cover no-repeat; box-shadow: 0 0 0 1.5px var(--cur-label); transition: box-shadow 180ms linear; }   /* a disc in the edition's colour, then its painting (cursor.js); a ring in the label's ink frames it on any colour of pill */
+.cursor__coin[hidden] { display: none; }
+.cursor.is-flip .cursor__pill { --dx: calc(-100% - 20px); transform-origin: 100% 50%; }
+/* two thin rings on a click: the cursor's ink, 1 px, scale and fade only */
+.cursor-rings { position: fixed; inset: 0; z-index: 99; pointer-events: none; overflow: hidden; }
+.cursor-ring { position: absolute; border: 1px solid; border-radius: 50%; }
+@media print { .cursor, .cursor-rings { display: none; } }

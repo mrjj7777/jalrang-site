@@ -1,0 +1,302 @@
+/* JALRANG — the shop (shop.html), Edition One
+   Colour worlds: one colour per screen, one bottle on its plinth, one cut between worlds.
+   Values come from the redesign spec (15 October 2026). Sections follow its D2 order.
+   Loaded after css/fonts.css and css/site.css, which hold the shared tokens, base, type, controls,
+   fields, header, menu, toast and footer (16 October 2026). */
+
+/* ========== 1. Tokens (the shop's own; the shared ones are in css/site.css) ========== */
+:root {
+  /* The giant word resolves inside a frame (cqw). --t-giant is the largest it may be; main.js
+     (fitGiant) brings it down so the word's ink keeps 72 px clear of every text block and proof
+     frame under it (B10.6). */
+  --t-giant: min(33cqw, 40vh);
+  /* where a giant word's line box sits so its cap ink tops out at 12.2vh; measured at runtime
+     from the real font (main.js); this default is Jaini at line-height 1.1 */
+  --giant-r: 0.015;
+  /* the chrome inks before the worlds engine has run: the first screen is Chuna */
+  --nav-ink: #1A1612; --nav-ground: #F7F2E8; --index-ink: #1A1612;
+}
+
+/* ========== 3. Type (the shop's display sizes) ========== */
+.giant {
+  font-family: var(--f-display); font-weight: 400; font-style: normal; text-transform: none;
+  font-variant-numeric: lining-nums; font-kerning: normal; font-feature-settings: 'kern' 1, 'liga' 1; word-spacing: 0.05em;
+}
+.giant { font-size: var(--t-giant); line-height: 1.1; letter-spacing: -0.01em; color: var(--deep); white-space: nowrap; }
+html.no-giant .giant { display: none; }
+
+/* ========== 5. Layers (B6: one root stacking context; sections create none) ========== */
+/* frames 10 + i and overlays 40 + i are set by the worlds controller; the header (50), the toast
+   (65) and the menu (70) are in site.css */
+#gl, .stage2d { z-index: 30; }
+.index { z-index: 50; }
+.cover { z-index: 60; }
+.flowsec { position: relative; z-index: 20; }
+
+/* the WebGL bottle: a transparent canvas over the frames, the layout width wide (clientWidth) */
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.mode-2d #gl, .mode-flow #gl { display: none; }
+/* PARITY 'hybrid' (B8.11): the packshots at rest and in every cut, the canvas only inside the
+   four motions; 160 ms crossfade at each switch */
+.parity-hybrid #gl, .parity-hybrid .stage2d { transition: opacity 160ms linear; }
+.parity-hybrid #gl { opacity: 0; }
+.parity-hybrid.gl-on #gl { opacity: 1; }
+.parity-hybrid.gl-on .stage2d { opacity: 0; }
+/* B9 the 2D stage: two full-screen layers, each clipped in screen pixels like the frames */
+.stage2d { position: fixed; inset: 0; pointer-events: none; }
+.pk { position: absolute; inset: 0; visibility: hidden; }
+.pk__img { position: absolute; height: 74.2vh; width: auto; max-width: none; top: 12.66vh; left: 50%; transform: translateX(-50.3%); }
+
+/* ========== 6. Frames ========== */
+/* each world is a scroll track; its frame is fixed and revealed by the cut (worlds.js) */
+/* every edition world: a 60vh cut, then a 50vh hold in which the bottle turns once (3D); the first
+   screen has no cut and a short hold; in 2D (no turn) the hold is shorter */
+.world { --cut: 60; --hold: 50; position: relative; height: calc((var(--cut) + var(--hold)) * 1vh); }
+#top { --cut: 0; --hold: 12; }
+#ten { --hold: 40; }
+.mode-2d .world--ed { --hold: 30; }
+.frame {
+  position: fixed; inset: 0; z-index: 10; overflow: hidden; container-type: inline-size;
+  background: var(--ground); color: var(--text); clip-path: inset(100% 0 0 0);
+  --col: calc((100cqw - 2 * var(--margin) - 11 * var(--gutter)) / 12);
+  /* four columns, but never closer than 112 px to the bottle (9.83vh is half its body): this only
+     bites below about 1200 px wide, e.g. 1024 × 768 */
+  --zone-w: min(calc(4 * var(--col) + 3 * var(--gutter)), calc(50cqw - 9.83vh - 112px - var(--margin)));
+  --proof-x: calc(var(--margin) + 8 * (var(--col) + var(--gutter)));
+}
+#top > .frame { clip-path: none; }
+/* until the title is fitted with the real font (main.js), the first screen shows only its ground */
+.is-loading #top .intro__title, .is-loading #top .intro__foot { visibility: hidden; }
+/* the same for the index (it would show at the left of the blank screen, then jump right as its swatches arrive) and for All ten (in flow
+   until the ten worlds are built above it: it would leave the window, a layout shift of 0.88) */
+.is-loading #ten, .is-loading .index { visibility: hidden; }
+.ground { position: absolute; inset: 0; pointer-events: none; }
+.giant { position: absolute; left: var(--margin); top: calc(12.2vh - var(--giant-r) * var(--t-giant)); margin: 0; }
+/* the words zone: c1–c4, bottom edge at 87.4vh */
+.words { position: absolute; left: var(--margin); bottom: 12.6vh; width: var(--zone-w); z-index: 2; }
+/* the proof zone: c9–c12, right-aligned; its parts sit at fixed bands */
+.proof { position: absolute; inset: 0; margin: 0; pointer-events: none; z-index: 2; }
+.proof > * { pointer-events: auto; }
+.proof__label { position: absolute; right: var(--margin); top: 40.2vh; text-align: right; }
+.proof__frame { position: absolute; right: var(--margin); top: 43vh; height: 41vh; aspect-ratio: 3 / 4; overflow: hidden; background: color-mix(in srgb, var(--ground) 88%, var(--text)); }
+.proof__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.proof__cap { position: absolute; right: var(--margin); top: 85.4vh; max-width: var(--zone-w); text-align: right; text-wrap: balance; }   /* one line at 1280 and up; two on a 1024 screen, never past the edge */
+/* flow mode only: each section shows its own packshot (B9 placement) */
+.packshot { display: none; position: absolute; height: 74.2vh; width: auto; max-width: none; top: 12.66vh; left: 50%; transform: translateX(-50.3%); z-index: 1; pointer-events: none; }
+
+/* ========== 7. The bottle's footing ========== */
+/* the bottle stands on the ground itself, with the soft contact shadow the landing uses (one staging
+   for the landing and the shop). .plinth stays as the invisible anchor at the base line (84.2vh). */
+.plinth { position: absolute; left: 50%; transform: translateX(-50%); width: 37.3vh; top: 84.2vh; height: 0; }
+.plinth__shadow { position: absolute; left: 50%; top: -1.2vh; width: 24.5vh; height: 2.4vh; transform: translateX(-50%);
+  border-radius: 50%; background: radial-gradient(closest-side, var(--deep), transparent); opacity: 0.6; z-index: 1; }
+
+/* ========== 9. Index (B10.2) ========== */
+.index { position: fixed; left: var(--margin); bottom: 24px; height: 44px; display: flex; align-items: center; color: var(--index-ink); transition: opacity var(--d-swap) linear; }
+.index.is-hidden { opacity: 0; pointer-events: none; }
+.index__swatches { display: flex; }
+.swatch { position: relative; width: 24px; height: 44px; display: grid; place-items: center; }
+.swatch::after { content: ''; position: absolute; inset: 0 -10px; }   /* a 44 px wide target; the next swatch's wins where they overlap */
+.swatch i { display: block; width: 12px; height: 12px; background: var(--sw); box-shadow: inset 0 0 0 1px var(--index-ink); }
+.swatch.is-current i { outline: 2px solid var(--index-ink); outline-offset: 2px; }
+.swatch:focus-visible { outline-offset: 0; }
+.index__label { margin-left: 16px; white-space: nowrap; }
+/* B12: the motion note sits on the first screen, under the facts (no index there) */
+.motion-note { margin-top: 24px; max-width: 46ch; }
+.motion-note .link { font-weight: 600; }
+
+/* ========== 11. The first screen (S0) ========== */
+/* Chuna paper. "Edition One" with its ink margin to margin and its cap ink at the giant words' line
+   (12.2vh; run.js layoutIntro measures it); the facts and "See all ten" on one bottom line; then the
+   ten in spectrum order, ten columns on the All ten grid, each bar in its edition's ground. The
+   strip's last line sits on the words zone's bottom edge (87.4vh), like every plate. */
+.intro__title { position: absolute; left: var(--intro-x, var(--margin)); top: var(--intro-top, 10vh); margin: 0;
+  font-family: var(--f-display); font-weight: 400; font-size: var(--intro-size, min(15cqw, 24vh)); line-height: 1; letter-spacing: -0.01em; white-space: nowrap; color: var(--kajal); }
+.intro__word { display: block; }
+.intro__foot { position: absolute; left: var(--margin); right: var(--margin); bottom: 12.6vh; z-index: 2;
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: end; }
+.intro__words { grid-column: 1 / span 5; }
+.intro__body { margin-top: 16px; max-width: 34em; }
+.intro__set { grid-column: 8 / span 5; justify-self: end; display: flex; align-items: baseline; gap: 24px; white-space: nowrap; }
+.intro__cat { grid-column: 1 / -1; margin-top: 7.8vh; display: flex; align-items: center; gap: 24px; padding-top: 20px; border-top: 1px solid var(--rule); }
+.cat { display: flex; flex-wrap: wrap; gap: 0 4px; }
+.cat__chip { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px 0 0; text-decoration: none; }
+.cat__sw { display: block; width: 20px; height: 20px; background: var(--chip); box-shadow: inset 0 0 0 1px rgba(26, 22, 18, 0.25); transition: transform var(--d-quick) var(--ease-flow); }
+.cat__chip:hover .cat__sw, .cat__chip:focus-visible .cat__sw { transform: scale(1.3); }
+.cat__chip:hover .cat__n { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+
+/* ========== 13. The ten worlds (S1) ========== */
+/* a 2.5% crop: place-05 has a 6 px black border baked into both sides */
+.proof--place .proof__frame img { transform: scale(1.025); }
+.plate > .t-label + .plate__art { margin-top: 16px; }
+.plate__meta { margin-top: 12px; }
+.plate__line { margin-top: 24px; }
+.plate__price { margin-top: 24px; }
+.plate__actions { margin-top: 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 16px 32px; }
+.plate__more { white-space: nowrap; }
+
+/* ========== 17. Ten (C7) ========== */
+.world--ten { height: 200vh; padding-top: calc(var(--cut) * 1vh); }
+.world--ten.is-flowing > .frame { position: sticky; top: 0; right: auto; bottom: auto; left: auto; width: 100%; height: 100vh; clip-path: none; }
+.ten__title { position: absolute; left: var(--margin); top: 16vh; }
+.ten__title span { display: block; }
+.ten__set { position: absolute; right: var(--margin); top: 19vh; display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
+/* the row of ten (buildRow, shared with the opening): ten columns, 16 px apart, across the content
+   width; each picture stands in a clip box whose bottom edge is the 1.5 px Kajal waterline */
+.tenrow { --pic-h: min(228px, 24.9vh); --img-h: min(186px, 20.3vh); --lift: -9%; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); column-gap: 16px; align-items: start; }
+/* the waterline is one unbroken 1.5 px line: each column draws its own stretch plus half the gap on
+   either side (the first and last stop at the row's ends), level with the bottom of the clip box */
+.tenrow__col { position: relative; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.tenrow__col::before { content: ''; position: absolute; left: -8px; right: -8px; top: calc(var(--pic-h) - 1.5px); height: 1.5px; background: var(--kajal); z-index: 1; pointer-events: none; }
+.tenrow__col:first-child::before { left: 0; }
+.tenrow__col:last-child::before { right: 0; }
+.tenrow__pic { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: var(--pic-h); overflow: hidden; padding-bottom: 1.5px; }
+.tenrow__img { height: var(--img-h); width: auto; max-width: none; flex: none; pointer-events: none; user-select: none; }
+.ten__pic:focus-visible { outline-offset: 6px; }
+/* the bottle pop-up (the cursor's pill, js/shop/cursor.js, names the colour beside it): the picture box has
+   40 px of headroom above the bottle, so the bottle under the pointer, or in keyboard focus, can lift 9% of
+   its height over 420 ms with 'flow'; the others dim (opacity .5, saturate .65) and their words to .66.
+   The rise through the waterline (ten.js) is `transform`; the lift is `translate`, so they add up. */
+.tenrow__img { translate: 0 0; transition: translate 420ms var(--ease-flow), opacity 420ms var(--ease-flow), filter 420ms var(--ease-flow); }
+.tenrow__cap, .tenrow__add { transition: opacity 420ms var(--ease-flow); }
+.tenrow__col:has(:focus-visible) .tenrow__img { translate: 0 var(--lift); }
+.tenrow:has(:focus-visible) .tenrow__col:not(:has(:focus-visible)) .tenrow__img { opacity: 0.5; filter: saturate(0.65); }
+.tenrow:has(:focus-visible) .tenrow__col:not(:has(:focus-visible)) :is(.tenrow__cap, .tenrow__add) { opacity: 0.66; }
+@media (hover: hover) {
+  .tenrow__col:hover .tenrow__img { translate: 0 var(--lift); }
+  .tenrow:has(.tenrow__col:hover) .tenrow__col:not(:hover) .tenrow__img { opacity: 0.5; filter: saturate(0.65); }
+  .tenrow:has(.tenrow__col:hover) .tenrow__col:not(:hover) :is(.tenrow__cap, .tenrow__add) { opacity: 0.66; }
+}
+@media (prefers-reduced-motion: reduce) { .tenrow__img, .tenrow__cap, .tenrow__add { transition: none; } }
+.tenrow__cap { margin-top: 18px; display: flex; flex-direction: column; }
+.tenrow__cap .t-label { margin-bottom: 4px; }
+/* "Add": a text button whose hit area is 44 px tall without moving the captions */
+.tenrow__add { position: relative; margin-top: 2px; }
+.tenrow__add::after { content: ''; position: absolute; left: -11px; right: -11px; top: 50%; height: 44px; transform: translateY(-50%); }
+/* the waterline at 72vh: the row's top is one picture box above it. In a window under about 640 px high the row stands higher, so
+   its captions end 63 px above the window's foot and stay clear of the index (the colour chips, bottom left) */
+.ten__row { position: absolute; left: var(--margin); right: var(--margin); top: min(calc(72vh - var(--pic-h)), calc(100vh - var(--pic-h) - 184px)); }
+/* phone (C7): the display, the set line, a full-width "Add the ten", then a row that scrolls
+   sideways and snaps, columns 40vw wide on one waterline, captions under each */
+/* narrow (a phone, a tablet held upright, or a window the fixed frames do not fit): html.is-narrow, set by env.js (NARROW) */
+:where(.is-narrow).mode-flow #ten > .frame { padding: 72px 0 48px; min-height: 0; }
+:where(.is-narrow) #ten .ten__title { position: relative; inset: auto; margin: 0 var(--margin); }
+:where(.is-narrow) #ten .ten__set { position: relative; inset: auto; margin: 24px var(--margin) 0; align-items: stretch; }
+:where(.is-narrow) #ten .ten__set .btn { width: 100%; }
+:where(.is-narrow) #ten .ten__row { position: relative; inset: auto; margin-top: 40px; overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory; scroll-padding: 0 var(--margin); padding: 6px var(--margin) 8px; scrollbar-width: none; }
+:where(.is-narrow) #ten .ten__row::-webkit-scrollbar { display: none; }
+:where(.is-narrow) #tenRow.tenrow { --pic-h: 46vw; --img-h: 43vw; --lift: -5%; grid-template-columns: repeat(10, 34vw); }
+:where(.is-narrow) #tenRow .tenrow__col { scroll-snap-align: start; }
+
+
+/* ========== 18. Spec (C8) ========== */
+/* in flow, on Chuna: the table in c1–c7, the photograph sticky in c8–c12; 168 px air above, 112 below */
+.spec { background-color: var(--ground); color: var(--text); padding: var(--s10) var(--margin) var(--s9); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: start; }
+.spec__body { grid-column: 1 / span 7; }
+.spec__table { margin-top: 24px; border-collapse: collapse; width: 100%; }
+.spec__table tr { border-top: 1px solid rgba(26, 22, 18, 0.24); height: 56px; }
+.spec__table tr:last-child { border-bottom: 1px solid rgba(26, 22, 18, 0.24); }
+.spec__table th { width: 140px; padding: 0 16px 0 0; text-align: left; color: var(--soot); vertical-align: middle; }
+.spec__table td { padding: 0; color: var(--kajal); vertical-align: middle; }
+.spec__note { margin-top: 24px; color: var(--soot); }
+.spec__fig { grid-column: 8 / span 5; align-self: stretch; margin: 0; position: relative; min-height: 420px; }
+/* the photograph runs the table's full height, a portrait crop round the glass and the bottle */
+.spec__fig img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+/* phone: each row is its label over its value; the footnote; then the photograph at full width */
+/* narrow (a phone, a tablet held upright, or a window the fixed frames do not fit): html.is-narrow, set by env.js (NARROW) */
+:where(.is-narrow) .spec { display: block; padding: 96px var(--margin) 72px; }
+:where(.is-narrow) .spec__table, :where(.is-narrow) .spec__table tbody, :where(.is-narrow) .spec__table tr, :where(.is-narrow) .spec__table th, :where(.is-narrow) .spec__table td { display: block; }
+:where(.is-narrow) .spec__table tr { height: auto; padding: 12px 0; }
+:where(.is-narrow) .spec__table th { width: auto; padding: 0 0 4px; }
+:where(.is-narrow) .spec__fig { position: static; margin-top: 32px; min-height: 0; }
+:where(.is-narrow) .spec__fig img { position: static; height: auto; aspect-ratio: 16 / 9; }
+
+
+/* ========== 21. Menu: the ten (the shop's addition to the shared menu) ========== */
+.menu__tenlabel { margin-top: 40px; }
+.menu__ten { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--gutter); }
+.menu__ten li:nth-child(-n+2) a { border-top: 1px solid var(--rule); }
+.menu__ten a { display: flex; align-items: center; gap: 12px; min-height: 44px; border-bottom: 1px solid var(--rule); text-decoration: none; }
+.menu__ten a .t-label { width: 20px; }
+.menu__ten a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+
+/* ========== 22. Cover (B10.11, the covered jump) ========== */
+.cover { position: fixed; inset: 0; background: var(--cover-ground, var(--chuna)); clip-path: inset(100% 0 0 0); pointer-events: none; }
+
+/* ========== 23. Compact screens (B3) ========== */
+@media (min-width: 768px) and (max-height: 820px) {
+  :root { --t-giant: min(33cqw, 36vh); }   /* the type steps are in site.css */
+  .plate__line, .plate__price, .plate__actions { margin-top: 16px; }
+}
+
+/* ========== 24. Flow (B1, B12, B13) ========== */
+/* mode-flow: every section in normal flow, at least one screen tall, laid out like its frame, with
+   its own packshot on its own plinth (stage2d.js fitPackshots places each bottle). Nothing moves. */
+.mode-flow .world { height: auto; }
+.mode-flow .world--ten { height: auto; padding-top: 0; }
+.mode-flow .frame { position: relative; inset: auto; min-height: 100svh; clip-path: none; z-index: auto; }
+.mode-flow .stage2d { display: none; }
+.mode-flow .packshot { display: block; }
+.mode-flow .nav::before { opacity: 1; }
+
+/* ========== 25. Phone (B13: 390 × 844, mode-flow) ========== */
+/* narrow (a phone, a tablet held upright, or a window the fixed frames do not fit): html.is-narrow, set by env.js (NARROW).
+   The fixed frames need a landscape window of at least 900 px wide, 640 px high (520 from 1180 px wide). */
+/* the nav: a 56 px solid band; its 4 px index strip directly under it, never interactive */
+:where(.is-narrow) .index { left: 0; right: 0; top: var(--nav-h); bottom: auto; height: 4px; }
+:where(.is-narrow) .index__swatches { width: 100%; height: 4px; align-items: flex-start; }
+:where(.is-narrow) .swatch { flex: 1; height: 4px; pointer-events: none; }
+:where(.is-narrow) .swatch i { width: 100%; height: 4px; box-shadow: none; }
+:where(.is-narrow) .swatch.is-current i { height: 8px; outline: none; box-shadow: inset 0 -2px 0 var(--index-ink); }   /* the ring's job: it reads on its own ground */
+:where(.is-narrow) .index__label { display: none; }
+
+/* one template for every world. --pl is the plinth's root (its top ellipse's centre line):
+   giant word (ink top 80) → bottle (its cap 20 px under the word) → plinth with its caption on
+   the face → the text block in flow, 40 px under the plinth's face → proof, full width */
+:where(.is-narrow).mode-flow .frame { --pl: 62svh; display: flex; flex-direction: column; align-items: stretch;
+  padding: calc(var(--pl) + 48px) var(--margin) 96px; }
+:where(.is-narrow).mode-flow .words, :where(.is-narrow).mode-flow .proof { position: relative; left: auto; right: auto; bottom: auto; top: auto; width: auto; inset: auto; }
+:where(.is-narrow).mode-flow .proof > * { position: relative; right: auto; top: auto; left: auto; }
+:where(.is-narrow).mode-flow .proof { margin-top: 48px; display: flex; flex-direction: column; }
+:where(.is-narrow).mode-flow .proof__frame { width: 100%; height: auto; aspect-ratio: 3 / 4; }
+:where(.is-narrow).mode-flow .proof__label { align-self: flex-end; margin-bottom: 12px; }
+:where(.is-narrow).mode-flow .proof__cap { max-width: none; white-space: normal; text-align: left; margin-top: 12px; }
+:where(.is-narrow).mode-flow .packshot { height: 47svh; top: 15svh; }   /* first paint only: fitPackshots places it */
+:where(.is-narrow).mode-flow .plinth { width: 52vw; top: var(--pl); height: 0; bottom: auto; }
+:where(.is-narrow).mode-flow .plinth__shadow { top: -0.6svh; width: 30vw; height: 1.2svh; }
+/* the frame's container is its content box (342 px at 390: the 24 px margins are its padding), so
+   100cqw is already the room between the margins. Morpankhi, the longest colour word, is 3.65em in Jaini */
+:where(.is-narrow).mode-flow .giant { --t-giant: calc(100cqw / 3.7); top: 80px; left: var(--margin); }
+
+/* the plate: "Add" full width, "View details" under it */
+:where(.is-narrow) .plate__actions { flex-direction: column; align-items: stretch; gap: 8px; }
+:where(.is-narrow) .plate__add { width: 100%; }
+:where(.is-narrow) .plate__more { align-self: flex-start; min-height: 44px; display: inline-flex; align-items: center; }
+
+/* the first screen on a phone: the title margin to margin under the header, the facts, the set line,
+   then the ten as two columns of five */
+:where(.is-narrow).mode-flow #top > .frame { min-height: 0; display: block; padding: calc(var(--intro-ink-bottom, 160px) + 40px) var(--margin) 72px; }
+:where(.is-narrow) .intro__foot { position: relative; left: auto; right: auto; bottom: auto; display: block; }
+:where(.is-narrow) .intro__set { justify-self: stretch; justify-content: space-between; margin-top: 24px; white-space: normal; flex-wrap: wrap; gap: 8px 24px; }
+:where(.is-narrow) .intro__cat { margin-top: 40px; }
+:where(.is-narrow) .intro__cat { display: block; }
+:where(.is-narrow) .cat { margin-top: 8px; }
+
+/* all ten: no frame template; the display, the set line, "Add the ten", then the row */
+:where(.is-narrow) .ten__title, :where(.is-narrow) .ten__set, :where(.is-narrow) .ten__row { position: relative; inset: auto; }
+:where(.is-narrow) .spec { grid-template-columns: 1fr; }
+
+/* ========== 26. Cursor hit-proxy over the big bottle (js/shop/cursor.js) ========== */
+/* the bottle is drawn in WebGL, so a transparent link sits over its box (14 vh to 84.2 vh, 19.6 vh wide):
+   the pill reads "View" with the painting's chip, and a click opens that edition's page. Only where a
+   mouse can hover; the phone, the flow layouts and the touch screens never get it. */
+.world--ed .bhit { position: absolute; z-index: 3; left: 50%; top: 14vh; width: 19.6vh; height: 70.2vh; transform: translateX(-50%); display: block; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) { .world--ed .bhit { pointer-events: auto; } }
+.mode-flow .world--ed .bhit, :where(.is-narrow) .world--ed .bhit { display: none; }
+
+/* ========== 27. Reduced motion ========== */
+/* mode-flow when calm: value swaps, dialogs and jumps are instant (JS); site.css stops every transition under .is-calm */
+@media (prefers-reduced-motion: reduce) {
+  .index, .cat__sw { transition: none; }
+}

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en-GB" class="is-loading">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Edition One — JALRANG</title>
+<meta name="description" content="Shop JALRANG Edition One: ten insulated steel bottles, ten Indian art traditions, each drawn all the way round, each in its own colour. A concept shop by J&amp;J Co.; nothing is sold.">
+<meta name="theme-color" content="#F7F2E8">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1612'/%3E%3Cpath d='M32 9c8 12 16 20 16 31a16 16 0 0 1-32 0c0-11 8-19 16-31z' fill='%23C3361D'/%3E%3Cpath d='M25 41a7 7 0 0 0 5 6' fill='none' stroke='%23F7F2E8' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>
+/* a plain message instead of a blank page when the page cannot start: opened as a file, or a script that did not load */
+(function () {
+  function say(t) {
+    if (document.getElementById('bootMsg')) return;
+    var d = document.createElement('div'); d.id = 'bootMsg'; d.className = 'noscript'; d.setAttribute('role', 'alert');
+    var p = document.createElement('p'); p.textContent = t; d.appendChild(p);
+    (document.body || document.documentElement).appendChild(d);
+  }
+  if (location.protocol === 'file:') {
+    document.addEventListener('DOMContentLoaded', function () { say('JALRANG cannot run straight from a file. Open "Open JALRANG.bat" in the folder, or use the published link.'); });
+    return;
+  }
+  addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'SCRIPT') say('Something did not load. Please check your connection and reload the page.');
+  }, true);
+})();
+</script>
+<meta property="og:title" content="Shop Edition One — JALRANG">
+<meta property="og:description" content="Ten Indian art traditions, drawn all the way round. A concept by J&amp;J Co.">
+<meta property="og:image" content="assets/img/og-jalrang.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="JALRANG">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="JALRANG: ten insulated steel bottles standing in a row, each painted in one Indian art tradition.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="assets/fonts/jaini-normal-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/main.css">
+<script type="importmap">{"imports": {"three": "./js/vendor/three/three.module.min.js"}}</script>
+</head>
+<body>
+<a class="skip-link t-button" href="#main">Skip to content</a>
+<noscript><div class="noscript" role="alert"><p>JALRANG is a concept site and needs JavaScript to show its bottles. Please turn JavaScript on and reload the page.</p></div></noscript>
+
+<!-- B6 z 30: the bottle. WebGL in mode-3d, two packshots in mode-2d -->
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="stage2d" id="stage2d" aria-hidden="true" hidden>
+  <div class="pk pk--a"><img class="pk__img" alt=""></div>
+  <div class="pk pk--b"><img class="pk__img" alt=""></div>
+</div>
+
+<!-- the shared header (z 50): js/shop/chrome.js fills it -->
+<header id="siteHeader"></header>
+
+<!-- B10.2 index (z 50): the colour on screen -->
+<nav class="index" id="index" aria-label="Chapter and colour">
+  <div class="index__swatches" id="indexSwatches"></div>
+  <p class="t-label index__label" id="indexLabel">01 / 10 · Sindoor</p>
+</nav>
+
+<main id="main" tabindex="-1">
+
+<!-- S0. The shop's own first screen (Chuna): the edition's name margin to margin, the facts, and the
+     ten in spectrum order, each a way into its world. No bottle on this screen: world 01 rises next. -->
+<section class="world world--intro" id="top" data-ground="chuna" data-chapter="" aria-labelledby="shopTitle">
+  <div class="frame paper" data-ground="chuna">
+    <h1 class="intro__title" id="shopTitle"><span class="intro__word">Edition One</span></h1>
+    <div class="intro__foot">
+      <div class="intro__words">
+        <p class="t-h3 intro__lead">Ten bottles · ₹4,800 each</p>
+        <p class="t-body intro__body">Each carries one Indian art tradition, drawn all the way round, and each has a colour of its own. Made in Morbi, Gujarat.</p>
+        <p class="motion-note" id="motionNote" hidden><span class="t-small note__text"></span> <button class="link t-small" type="button"></button></p>
+      </div>
+      <div class="intro__set">
+        <p class="t-small">All ten, in a sheesham case — ₹46,000</p>
+        <a class="link t-button hit" href="#ten" data-p="1">See all ten</a>
+      </div>
+      <nav class="intro__cat" aria-labelledby="catLabel">
+        <p class="t-label" id="catLabel">The ten</p>
+        <ol class="cat" id="shopCat"><!-- scenes/run.js buildRun() --></ol>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<!-- S1. The ten worlds, 01 Sindoor to 10 Rani: one template and one motion each (scenes/run.js) -->
+<div id="editions"></div>
+
+<!-- C7. All ten (Chuna) -->
+<section class="world world--ten" id="ten" data-ground="chuna" data-chapter="All ten" data-hold="40" aria-labelledby="ten-h">
+  <div class="frame paper" data-ground="chuna">
+    <h2 class="t-display ten__title" id="ten-h">All ten.</h2>
+    <div class="ten__set">
+      <p class="t-small">All ten, in a sheesham case — ₹46,000</p>
+      <button class="btn btn--kajal" type="button" id="addTen"><span>Add the ten</span></button>
+    </div>
+    <div class="ten__row" id="tenRow"><!-- scenes/ten.js buildRow(el, { captions: true }) --></div>
+  </div>
+</section>
+
+<!-- C8. Specification (Chuna, in flow) -->
+<section class="flowsec spec paper" id="spec" data-flow-section data-ground="chuna" data-chapter="Specification" aria-labelledby="spec-h">
+  <div class="spec__body">
+    <h2 class="t-label" id="spec-h">Specification</h2>
+    <table class="spec__table">
+      <tbody>
+        <tr><th scope="row" class="t-label">Capacity</th><td class="t-body">750 ml</td></tr>
+        <tr><th scope="row" class="t-label">Cold</th><td class="t-body">Cold up to 24 hours</td></tr>
+        <tr><th scope="row" class="t-label">Hot</th><td class="t-body">Hot up to 12 hours</td></tr>
+        <tr><th scope="row" class="t-label">Body</th><td class="t-body">18/8 (304) stainless steel, double wall, vacuum insulated</td></tr>
+        <tr><th scope="row" class="t-label">Cap</th><td class="t-body">Brass cap, steel inner</td></tr>
+        <tr><th scope="row" class="t-label">Size</th><td class="t-body">272 mm tall, 76 mm across</td></tr>
+        <tr><th scope="row" class="t-label">Weight</th><td class="t-body">About 420 g</td></tr>
+        <tr><th scope="row" class="t-label">Painting</th><td class="t-body">180 mm tall, all the way round</td></tr>
+        <tr><th scope="row" class="t-label">Engraving</th><td class="t-body">A name, up to 12 letters, on the base</td></tr>
+        <tr><th scope="row" class="t-label">Price</th><td class="t-body">₹4,800 · All ten, in a sheesham case — ₹46,000</td></tr>
+        <tr><th scope="row" class="t-label">Return</th><td class="t-body">Worn one out? Send it back. We recycle the steel</td></tr>
+      </tbody>
+    </table>
+    <p class="t-small spec__note">Hours measured with iced or boiling water, lid closed, at a room temperature of 25°C.</p>
+  </div>
+  <figure class="spec__fig"><img src="assets/img/macro-cold.webp" loading="lazy" alt="A glass of ice water beaded with condensation beside a dry JALRANG bottle on a stone desk." width="1254" height="706"></figure>
+</section>
+
+</main>
+
+<!-- C9. The shared footer (Kajal, in flow): js/shop/chrome.js fills it -->
+<footer id="siteFooter" class="flowsec" data-flow-section data-ground="kajal" data-chapter=""></footer>
+
+<!-- B6 z 60: the covered jump -->
+<div class="cover" id="cover" aria-hidden="true"></div>
+
+<!-- the toast (z 65) and the menu (z 70) are built by js/shop/chrome.js; the bag is bag.html;
+     "View details" opens product.html?n=NN -->
+
+<script src="js/vendor/gsap-3.15.0-gsap.min.js"></script>
+<script src="js/vendor/gsap-3.15.0-ScrollTrigger.min.js"></script>
+<script src="js/vendor/gsap-3.15.0-CustomEase.min.js"></script>
+<script src="js/vendor/lenis-1.3.26.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

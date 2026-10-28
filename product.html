@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edition One — JALRANG</title>
+<meta name="description" content="One bottle of JALRANG Edition One: an Indian art tradition, drawn all the way round an insulated steel bottle. A concept shop by J&amp;J Co.; nothing is sold.">
+<meta name="theme-color" content="#F7F2E8">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1612'/%3E%3Cpath d='M32 9c8 12 16 20 16 31a16 16 0 0 1-32 0c0-11 8-19 16-31z' fill='%23C3361D'/%3E%3Cpath d='M25 41a7 7 0 0 0 5 6' fill='none' stroke='%23F7F2E8' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>
+/* a plain message instead of a blank page when the page cannot start: opened as a file, or a script that did not load */
+(function () {
+  function say(t) {
+    if (document.getElementById('bootMsg')) return;
+    var d = document.createElement('div'); d.id = 'bootMsg'; d.className = 'noscript'; d.setAttribute('role', 'alert');
+    var p = document.createElement('p'); p.textContent = t; d.appendChild(p);
+    (document.body || document.documentElement).appendChild(d);
+  }
+  if (location.protocol === 'file:') {
+    document.addEventListener('DOMContentLoaded', function () { say('JALRANG cannot run straight from a file. Open "Open JALRANG.bat" in the folder, or use the published link.'); });
+    return;
+  }
+  addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'SCRIPT') say('Something did not load. Please check your connection and reload the page.');
+  }, true);
+})();
+</script>
+<meta property="og:title" content="Edition One — JALRANG">
+<meta property="og:image" content="assets/img/og-jalrang.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="JALRANG">
+<meta property="og:description" content="Ten Indian art traditions, drawn all the way round. A concept by J&amp;J Co.">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="JALRANG: ten insulated steel bottles standing in a row, each painted in one Indian art tradition.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="assets/fonts/jaini-normal-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/pages.css">
+<script type="importmap">{"imports": {"three": "./js/vendor/three/three.module.min.js"}}</script>
+</head>
+<body>
+<a class="skip-link t-button" href="#main">Skip to content</a>
+<noscript><div class="noscript" role="alert"><p>JALRANG is a concept site and needs JavaScript to show its bottles. Please turn JavaScript on and reload the page.</p></div></noscript>
+
+<!-- mode-3d: the bottle, on a transparent canvas over the page (z 30), under the header -->
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<!-- the shared header (z 50): js/shop/chrome.js fills it -->
+<header id="siteHeader"></header>
+
+<!-- one edition's page, the same template for all ten (js/pages/product.js fills it from ?n=NN):
+     buy · gallery · Unwrap it. · specification · more editions -->
+<main id="main" class="page product" tabindex="-1"></main>
+
+<!-- the shared footer (Kajal): js/shop/chrome.js fills it -->
+<footer id="siteFooter"></footer>
+
+<script src="js/vendor/gsap-3.15.0-gsap.min.js"></script>
+<script src="js/vendor/gsap-3.15.0-ScrollTrigger.min.js"></script>
+<script src="js/vendor/gsap-3.15.0-CustomEase.min.js"></script>
+<script src="js/vendor/lenis-1.3.26.min.js"></script>
+<script type="module" src="js/pages/product.js"></script>
+</body>
+</html>

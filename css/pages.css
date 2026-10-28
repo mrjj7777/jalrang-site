@@ -1,0 +1,420 @@
+/* JALRANG — the commerce pages: product.html, bag.html, account.html, checkout.html (16 October 2026).
+   Linked after css/fonts.css and css/site.css (tokens, type, controls, fields, header, footer).
+   The product page takes its edition's ground (data-edition on <main>); bag, account and checkout
+   sit on Chuna paper. One grid: 12 columns between the margins (72 px at 1505), 24 px gutters. */
+
+/* ========== 0. Shared pieces ========== */
+.hair { border: 0; height: 1px; margin: 0; background: color-mix(in srgb, var(--text) 24%, transparent); }
+.crumbs ol { display: flex; flex-wrap: wrap; align-items: center; column-gap: 10px; }
+.crumbs li + li::before { content: '/'; margin-right: 10px; }
+.crumbs a { text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.arrow-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; text-decoration: none; }
+.arrow-link:hover span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+/* a row of values with a hairline under it: label left, value right */
+.sumrow { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.sumrow--total { border-bottom: 0; padding-top: 20px; }
+/* a form's status line (errors announced politely) */
+.form__status:empty { display: none; }
+.field .field__msg { font-weight: 600; }
+.field__msg::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; background: currentColor; vertical-align: 1px; }
+.field__msg:empty::before { content: none; }
+.field label.t-label, .field > .t-label { display: block; }
+.field__row { position: relative; }
+.field__row input { padding-right: 88px; }
+.field__toggle { position: absolute; right: 4px; top: 6px; height: 44px; padding: 0 12px; }
+.field__opt { font-weight: 400; letter-spacing: 0.04em; text-transform: none; font-size: 13px; margin-left: 6px; }
+/* the stepper's numbers on a light ground */
+.qty__n { font-weight: 500; }
+
+/* ========== 1. Product: the buy screen ========== */
+.product { padding-top: 0; overflow-x: clip; }
+.ph, .pu__frame {
+  --col: calc((100cqw - 2 * var(--margin) - 11 * var(--gutter)) / 12);
+  --zone-w: min(calc(4 * var(--col) + 3 * var(--gutter)), calc(50cqw - 9.83vh - 112px - var(--margin)));
+}
+.ph { position: relative; height: 100vh; min-height: 640px; container-type: inline-size; overflow: hidden; }
+.giant {
+  font-family: var(--f-display); font-weight: 400; font-style: normal; font-feature-settings: 'kern' 1, 'liga' 1;
+  line-height: 1.1; letter-spacing: -0.01em; color: var(--deep); white-space: nowrap; margin: 0;
+}
+.ph__giant { --gs: calc(min(33cqw, 40vh) * var(--g, 1)); position: absolute; left: var(--margin); top: calc(12.2vh - 0.22 * var(--gs)); font-size: var(--gs); }
+.ph__giant > span { display: inline-block; }
+.ph__stage { position: absolute; inset: 0; pointer-events: none; }
+.ph__slot { position: absolute; left: 50%; top: 14vh; height: 70.2vh; width: 19.6vh; transform: translateX(-50%); }
+.ph__pk { position: absolute; height: 74.2vh; width: auto; max-width: none; top: 12.66vh; left: 50%; transform: translateX(-50.3%); z-index: 1; }
+.gl-ready .ph__pk { visibility: hidden; }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
+.mode-2d #gl, .mode-flow #gl { display: none; }
+/* the plinth (as on the shop): the edition's colour, lit from the left, its top an ellipse */
+/* the bottle stands on the ground over a soft contact shadow, as on the landing and the shop */
+.plinth { position: absolute; left: 50%; transform: translateX(-50%); width: 37.3vh; top: 84.2vh; height: 0; }
+.plinth__shadow { position: absolute; left: 50%; top: -1.2vh; width: 24.5vh; height: 2.4vh; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, var(--deep), transparent); opacity: 0.6; z-index: 1; }
+.ph__words { position: absolute; left: var(--margin); bottom: 12.6vh; width: max(var(--zone-w), 212px); z-index: 2; }   /* 212 px keeps the breadcrumb on one line at the narrowest fixed width, 900 px */
+.ph__name { margin-top: 20px; }
+.ph__meta { margin-top: 12px; }
+.ph__line { margin-top: 24px; max-width: 36ch; }
+.ph__jump { display: inline-flex; margin-top: 20px; }
+/* the buy panel: the edition's tint, Kajal text, square corners. It is never narrower than 220 px: at the narrowest the fixed frames go
+   (900 px wide) the zone beside the bottle is only 200 to 230 px, and the longest label, "Add 9 to bag — ₹43,200" (157 px), had 4 px to spare
+   (the panel then reaches a little towards the bottle) */
+.buy { position: absolute; right: var(--margin); bottom: 12.6vh; width: max(min(var(--zone-w), 460px), 220px); z-index: 2; color: var(--text); display: flex; flex-direction: column;
+  --line: color-mix(in srgb, var(--text) 30%, transparent); }
+/* on the edition's ground itself: hairlines, no box */
+.buy__head { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.buy .qty__b:disabled { color: inherit; opacity: 0.35; }
+.buy__engrave { margin-top: 24px; }
+.buy__engrave input { text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
+.field__hint { display: flex; justify-content: space-between; gap: 16px; }
+.buy__count { flex: none; font-variant-numeric: tabular-nums; }
+.buy .qty { margin-top: 20px; }
+.buy__add { margin-top: 24px; }
+.buy__note { margin-top: 16px; }
+@media (min-width: 768px) and (max-height: 820px) {
+  .buy { padding: 24px; }
+  .buy__engrave { margin-top: 16px; }
+  .buy .qty { margin-top: 14px; }
+  .buy__add { margin-top: 18px; }
+  .buy__note { margin-top: 12px; }
+  .ph__line { margin-top: 16px; }
+}
+
+/* ========== 2. Product: the gallery ========== */
+.pg { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto 1fr; column-gap: var(--gutter); padding: var(--s9) var(--margin) var(--s9); align-items: start; }
+/* the tabs top-aligned with the picture, the caption under them; the picture sits on a deep-tone mat */
+.pg__side { grid-column: 1 / span 4; grid-row: 1; margin-top: 16px; }
+.pg__tabs { margin-top: 24px; border-top: 1px solid color-mix(in srgb, var(--text) 24%, transparent); }
+.pg__tab { display: flex; align-items: baseline; gap: 20px; width: 100%; min-height: 64px; padding: 18px 0; border-bottom: 1px solid color-mix(in srgb, var(--text) 24%, transparent); }
+.pg__tab .t-lead { font-weight: 400; }
+.pg__tab:hover .t-lead { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.pg__tab[aria-selected="true"] .t-lead { font-weight: 600; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+.pg__tab:focus-visible { outline-offset: -2px; }
+.pg__n { width: 24px; flex: none; }
+.pg__view { grid-column: 5 / span 8; grid-row: 1 / span 2; justify-self: end; position: relative; box-shadow: 0 0 0 16px var(--deep); aspect-ratio: 3 / 4; height: min(calc(100vh - var(--s9) - 64px), 860px); margin: 16px 16px 0 0; /* the mat (16 px) stays inside the margin and the frame */ width: auto; overflow: hidden; background: color-mix(in srgb, var(--ground) 88%, var(--text)); }
+.pg__view:focus-visible { outline-color: var(--text); }
+.pg__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pg__media--place { transform: scale(1.025); }
+video.pg__media { cursor: pointer; }
+.pg__cap { grid-column: 1 / span 4; grid-row: 2; margin-top: 32px; display: flex; flex-direction: column; gap: 8px; }
+.pg__cap .t-label { margin-bottom: 4px; }
+
+/* ========== 3. Product: Unwrap it. ========== */
+.pu { position: relative; }
+.pu__frame { position: relative; container-type: inline-size; }
+.pu-pinned .pu { height: 320vh; }
+.pu-pinned .pu__frame { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.pu__text { position: absolute; left: var(--margin); bottom: 12.6vh; width: var(--zone-w); }
+.pu__text > * + * { margin-top: 24px; }
+.pu__text .uline-mask { padding-top: 0.12em; margin-top: -0.12em; }
+.pu__details { position: absolute; right: var(--margin); bottom: 12.6vh; width: var(--zone-w); transition: opacity var(--d-quick) var(--ease-tide); }
+/* the list names the detail in view (its number is marked on the open painting) */
+.pu__list li .t-small, .pu__list li .pu__k { transition: font-weight var(--d-swap) linear; }
+.pu__list li.is-on .t-small { font-weight: 600; }
+.pu__list li.is-on { box-shadow: inset 3px 0 0 var(--text); padding-left: 12px; }
+.pu__list { margin-top: 16px; border-top: 1px solid color-mix(in srgb, var(--text) 24%, transparent); }
+.pu__list li { display: grid; grid-template-columns: 36px 1fr; align-items: baseline; padding: 14px 0; border-bottom: 1px solid color-mix(in srgb, var(--text) 24%, transparent); }
+.pu__flat { display: none; }
+.pu-pinned .plinth { transform-origin: 50% 0; }
+/* the three details: a 44 px button on the motif (placed by product-unwrap.js); a fixed layer over the canvas */
+.hotspots { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+html:not(.pu-pinned) .hotspots { display: none; }
+.hotspot { --cap-dy: -40px; position: absolute; left: 0; top: 0; width: 44px; height: 44px; padding: 0; opacity: 0; pointer-events: none; color: var(--text); }
+.hotspot.is-on { opacity: 1; pointer-events: auto; }
+.hotspot__dot { position: absolute; left: 6px; top: 6px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-style: normal; letter-spacing: 0;
+  background: var(--chuna); color: var(--kajal); box-shadow: 0 0 0 1px var(--kajal), 0 2px 10px rgba(20, 10, 4, 0.25); transition: background var(--d-swap) linear, color var(--d-swap) linear; }
+.hotspot.is-cur .hotspot__dot { background: var(--kajal); color: var(--chuna); }
+/* the numbered marks carry the details; the words are in the list beside the painting */
+
+.hotspot__line { position: absolute; left: 28px; top: 21.5px; width: 48px; height: 1px; background: var(--text); transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--d-instant) var(--ease-tide); }
+.hotspot__cap { position: absolute; left: 76px; top: calc(22px + var(--cap-dy)); width: max-content; max-width: 320px; padding: 16px; background: var(--tint); color: var(--kajal); text-align: left; white-space: normal; clip-path: inset(100% 0 0 0); transition: clip-path var(--d-instant) var(--ease-tide); }
+.hotspot--left .hotspot__line { left: auto; right: 28px; transform-origin: 100% 50%; }
+.hotspot--left .hotspot__cap { left: auto; right: 76px; }
+.hotspot.is-on .hotspot__line { transform: scaleX(1); transition: transform var(--d-swap) var(--ease-flow); }
+.hotspot.is-on .hotspot__cap { clip-path: inset(0 0 0 0); transition: clip-path var(--d-quick) var(--ease-flow) var(--d-swap); }
+/* 2D, phone and calm: the flat painting with its three numbered details, in the page's flow */
+html:not(.pu-pinned) .pu { padding: var(--s9) var(--margin); }
+html:not(.pu-pinned) .pu__frame { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 48px; align-items: start; }
+html:not(.pu-pinned) .pu .plinth { display: none; }
+html:not(.pu-pinned) .pu__text, html:not(.pu-pinned) .pu__details { position: static; width: auto; grid-column: 1 / span 4; }
+html:not(.pu-pinned) .pu__text { grid-row: 1; }
+html:not(.pu-pinned) .pu__details { grid-row: 2; }
+html:not(.pu-pinned) .pu__flat { display: block; position: relative; grid-column: 5 / span 8; grid-row: 1 / span 2; margin: 0; }
+.pu__flat img { width: 100%; height: auto; aspect-ratio: 4 / 3; }
+.pu__sheet { position: relative; display: block; transform-origin: 50% 50%; }
+/* the curve of the bottle at the edges of the front view; it lifts as the painting opens (product.js) */
+.pu__shade { position: absolute; inset: 0; pointer-events: none; opacity: var(--shade, 0);
+  background: linear-gradient(to right, transparent 24%, rgba(20, 12, 6, 0.5) 25%, rgba(20, 12, 6, 0) 40%, rgba(20, 12, 6, 0) 60%, rgba(20, 12, 6, 0.5) 75%, transparent 76%); }
+.pu-roll .pu__mark { opacity: 0; transition: opacity var(--d-quick) linear; }
+.pu-roll .is-flat .pu__mark { opacity: 1; }
+.pu__mark { position: absolute; width: 32px; height: 32px; margin: -16px 0 0 -16px; border-radius: 50%; display: grid; place-items: center; background: var(--tint); color: var(--kajal); box-shadow: 0 0 0 1px var(--kajal); letter-spacing: 0; }
+.pu__mark:nth-of-type(1) { margin-left: -16px; }
+
+/* ========== 4. Product: specification ========== */
+.ps { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: var(--s9) var(--margin) var(--s10); align-items: start; }
+.ps__side { grid-column: 1 / span 4; position: sticky; top: calc(var(--nav-h) + 48px); }
+.ps__name { margin-top: 24px; }
+.ps__side > .t-small { margin-top: 8px; }
+.ps__add { margin-top: 32px; }
+.ps__body { grid-column: 5 / span 8; }
+.ps__table { width: 100%; border-collapse: collapse; border-top: 1px solid color-mix(in srgb, var(--text) 24%, transparent); }
+.ps__table th, .ps__table td { text-align: left; vertical-align: baseline; padding: 16px 0; border-bottom: 1px solid color-mix(in srgb, var(--text) 24%, transparent); }
+.ps__table th { width: 30%; padding-right: 24px; }
+.ps__note { margin-top: 20px; max-width: 60ch; }
+
+/* ========== 5. Product: more editions (Chuna) ========== */
+.pm { padding: var(--s9) var(--margin) var(--s9); color: var(--kajal); }
+.pm__head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: end; }
+.pm__head > h2 { grid-column: 1 / span 6; }
+.pm__pager { grid-column: 7 / span 6; display: flex; justify-content: space-between; gap: 24px; }
+.pm__step { display: flex; flex-direction: column; gap: 8px; text-decoration: none; min-width: 0; }
+.pm__step .t-label { display: inline-flex; align-items: center; gap: 10px; }
+.pm__step--next { text-align: right; align-items: flex-end; }
+.pm__step:hover .t-h3 { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.pm__list { margin-top: var(--s8); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--gutter); border-top: 1px solid var(--rule); }
+.pm__item { display: grid; grid-template-columns: 20px 64px minmax(0, 1fr) auto; column-gap: 12px; align-items: baseline; min-height: 64px; padding: 20px 0; border-bottom: 1px solid var(--rule); text-decoration: none; }
+.pm__chip { width: 14px; height: 14px; align-self: center; }
+.pm__art { font-weight: 500; }
+.pm__colour { text-align: right; }
+.pm__item:hover .pm__art { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+/* under 1024 px (a landscape window that is not narrow: 900 to 1023 wide) three columns leave the longest names (Pattachitra,
+   Kalamkari) no room before their colour and price: two columns. The narrow layout below sets one column and wins by order. */
+@media (max-width: 1023px) { .pm__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+
+/* ========== 6. Product: narrow (a phone, a tablet held upright, or a window the fixed frames do not fit) ========== */
+:where(.is-narrow) .ph { height: auto; min-height: 0; overflow: visible; padding: calc(var(--nav-h) + 24px) var(--margin) 56px; display: flex; flex-direction: column; }
+:where(.is-narrow) .ph__giant { --gs: calc(min((100cqw - 2 * var(--margin)) / 2.6, 30svh) * var(--g, 1)); position: relative; left: auto; top: auto; order: 1; line-height: 1; }
+:where(.is-narrow) .ph__stage { position: relative; inset: auto; order: 2; height: 56svh; margin: 8px calc(-1 * var(--margin)) 0; }
+:where(.is-narrow) .ph__slot { top: 1svh; height: 47.3svh; width: 13svh; }
+:where(.is-narrow) .ph__pk { height: 50svh; top: 0; }
+:where(.is-narrow) .ph .plinth { top: 48.2svh; width: 25svh; }
+:where(.is-narrow) .ph .plinth__shadow { top: -0.7svh; width: 16svh; height: 1.4svh; }
+:where(.is-narrow) .ph__words { position: static; order: 3; width: auto; margin-top: 32px; }
+:where(.is-narrow) .buy { position: static; order: 4; width: auto; margin: 40px 0 0; }
+:where(.is-narrow) .pg { display: flex; flex-direction: column; align-items: stretch; padding: 72px var(--margin); }
+:where(.is-narrow) .pg__view { order: 2; margin-top: 24px; margin-right: 0; max-height: none; height: auto; width: 100%; }
+:where(.is-narrow) .pg__cap { order: 3; margin-top: 16px; }
+:where(.is-narrow) .pg__tabs { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; margin-top: 16px; }
+:where(.is-narrow) .pg__tab { min-height: 52px; padding: 12px 0; gap: 8px; }
+:where(.is-narrow) .pg__view { box-shadow: none; }
+:where(.is-narrow) .pg__n { width: auto; }
+:where(.is-narrow) .pu { padding: 72px var(--margin); }
+:where(.is-narrow) .pu__frame { display: flex !important; flex-direction: column; row-gap: 32px; }
+:where(.is-narrow) .pu__flat { margin: 0 calc(-1 * var(--margin)); }
+:where(.is-narrow) .pu__mark { width: 28px; height: 28px; margin: -14px 0 0 -14px; }
+:where(.is-narrow) .ps { display: flex; flex-direction: column; padding: 72px var(--margin); }
+:where(.is-narrow) .ps__side { position: static; }
+:where(.is-narrow) .ps__body { margin-top: 40px; }
+:where(.is-narrow) .ps__table th { width: 38%; }
+:where(.is-narrow) .pm { padding: 72px var(--margin); }
+:where(.is-narrow) .pm__head { display: flex; flex-direction: column; align-items: stretch; gap: 32px; }
+:where(.is-narrow) .pm__pager { gap: 16px; }
+:where(.is-narrow) .pm__step .t-h3 { font-size: 22px; }
+:where(.is-narrow) .pm__list { grid-template-columns: 1fr; }
+:where(.is-narrow) .pm__item { grid-template-columns: 20px 56px minmax(0, 1fr) auto; padding: 14px 0; min-height: 52px; }
+/* under 360 px (a 320 px phone, or 400 % zoom) the longest name and colour no longer share a line: the colour goes under the name */
+@media (max-width: 359px) { :where(.is-narrow) .pm__item { grid-template-columns: 20px 56px minmax(0, 1fr); } :where(.is-narrow) .pm__colour { grid-column: 3; text-align: left; } }
+
+/* ========== 7. Bag, account, checkout: the Chuna pages ========== */
+.cpage { padding: calc(var(--s8) + 8px) var(--margin) var(--s10); }
+.cpage__head { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 24px; row-gap: 8px; }
+.cpage__head h1:focus { outline: none; }
+.cpage__sub { color: var(--soot); }
+/* the picture of a line: the packshot standing on its own colour */
+.thumb { position: relative; display: block; flex: none; width: 120px; aspect-ratio: 3 / 4; background: var(--ground); overflow: hidden; }
+.thumb img { position: absolute; left: 50%; bottom: 7%; height: 84%; width: auto; max-width: none; transform: translateX(-50%); transition: transform var(--d-quick) var(--ease-flow); }
+a.thumb:hover img { transform: translateX(-50%) translateY(-4px); }
+.thumb--set { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: 1fr 1fr; gap: 6% 2px; padding: 16% 6%; background: var(--mist); }
+.thumb--set img { position: static; transform: none; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }
+a.thumb--set:hover img { transform: none; }
+.thumb--s { width: 56px; }
+/* bag: lines (c1–c8) and the summary (c9–c12) */
+.bag { margin-top: var(--s7); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: start; }
+.bag__lines { grid-column: 1 / span 8; border-top: 1px solid var(--rule); }
+.line { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto 128px; grid-template-rows: auto 1fr; column-gap: 32px; align-items: start; padding: 24px 0; border-bottom: 1px solid var(--rule); background: var(--chuna); }
+.line > .thumb { grid-row: 1 / span 2; }
+/* Remove follows the stepper in the keyboard order, and sits under the words on screen */
+.line > .line__remove { grid-column: 2; grid-row: 2; justify-self: start; align-self: start; }
+.line__words .line__name { margin-top: 10px; }
+.line__name a { text-decoration: none; padding-block: 1px; }   /* an inline box's padding grows its touch area (43 to 45 px), not the line */
+.line__name a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.line__words > .t-small { margin-top: 6px; }
+.line__eng span { font-weight: 600; letter-spacing: 0.08em; }
+.line__remove { display: inline-flex; margin-top: 18px; }
+.line__qty { margin-top: 2px; }
+.line__price { text-align: right; padding-top: 10px; }
+.line__price .t-small { margin-top: 8px; color: var(--soot); }
+.summary { grid-column: 9 / span 4; position: sticky; top: calc(var(--nav-h) + 32px); background: var(--mist); padding: 32px; display: flex; flex-direction: column; }
+.summary > .t-label { padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.summary .sumrow { padding: 18px 0; }
+.summary__go { margin-top: 24px; }
+.summary__back { align-self: center; margin-top: 16px; }
+.summary__note { margin-top: 20px; color: var(--kajal); }
+/* empty: the line, the button, the ten standing on a line */
+.empty { margin-top: var(--s6); }
+.empty__lead { max-width: 40ch; }
+.empty__btn { margin-top: 32px; }
+.empty__note { margin-top: 16px; }
+/* the ten standing on one line (bag empty, checkout empty, no such edition; FIX2, 16 Oct 2026): the
+   landing's L6 row in small, each bottle a way to its page. A phone keeps the two-column list. */
+.tenline { --well: clamp(150px, 27vh, 280px); position: relative; margin-top: var(--s8); display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); column-gap: 16px; }
+.tenline::before { content: ''; position: absolute; left: 0; right: 0; top: var(--well); height: 1.5px; background: var(--kajal); z-index: 1; }
+.tenline__item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; }
+.tenline__well { position: relative; display: block; width: 100%; height: var(--well); overflow: hidden; }
+.tenline__well img { position: absolute; left: 50%; bottom: 0; translate: -50% 0; height: 94%; width: auto; max-width: none; transition: transform var(--d-quick) var(--ease-flow); }
+.tenline__item:hover .tenline__well img, .tenline__item:focus-visible .tenline__well img { transform: translateY(-8px); }
+.tenline__item .chip { display: none; width: 10px; height: 10px; }
+.tenline__n { margin-top: 20px; }
+.tenline__art { margin-top: 6px; font-weight: 600; }
+.tenline__item:hover .tenline__art { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.tenline__item:focus-visible { outline-offset: 6px; }
+
+/* account: the picture (c1–c6, to the left edge) and the panel (c8–c12) */
+.acct { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: 0 var(--margin) 0 0; min-height: calc(100svh - var(--nav-h)); }
+.acct__pic { grid-column: 1 / span 6; position: sticky; top: var(--nav-h); height: calc(100svh - var(--nav-h)); margin: 0; overflow: hidden; background: var(--mist); }
+.acct__pic img { width: 100%; height: 100%; object-fit: cover; }
+/* the panel hangs from a fixed line (16% of the screen under the header), so the title stays put when errors appear or the tab changes */
+.acct__panel { grid-column: 8 / span 5; padding: max(var(--s8), calc((100svh - var(--nav-h)) * 0.16)) 0 var(--s9); align-self: start; }
+.acct__panel h1:focus { outline: none; }
+.seg { margin-top: 32px; display: flex; gap: 32px; border-bottom: 1px solid var(--rule); }
+.seg__b { position: relative; min-height: 48px; display: inline-flex; align-items: center; font-weight: 400; }
+.seg__b[aria-selected="true"] { font-weight: 600; }
+.seg__b[aria-selected="true"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--kajal); }
+.seg__b:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.form { margin-top: 32px; display: flex; flex-direction: column; gap: 20px; }
+.co .field :is(input, select), .acct .field :is(input, select) { scroll-margin-top: calc(var(--nav-h) + 32px); }
+.form > .btn { margin-top: 12px; }
+.form__status { font-weight: 600; color: var(--error); }
+.form__status .link { color: inherit; }
+.acct__note { margin-top: 16px; color: var(--kajal); }
+.guest { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 12px; }
+.guest .btn { margin-top: 8px; }
+.signed > * + * { margin-top: 16px; }
+.signed .t-lead { margin-top: 24px; overflow-wrap: anywhere; }
+.signed__actions { margin-top: 40px !important; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.signed__out { margin-top: 24px !important; display: inline-flex; }
+
+/* checkout: the step (c1–c7) and the summary (c9–c12) */
+.co { margin-top: var(--s7); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: start; }
+.co__main { grid-column: 1 / span 7; }
+/* an empty bag: the panel takes the whole width, so the ten stand on the full line */
+.is-bare .co__main { grid-column: 1 / -1; }
+.co .summary { grid-column: 9 / span 4; }
+.summary .mini { margin-top: 8px; }
+.mini__line { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; column-gap: 16px; align-items: start; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.mini__words { min-width: 0; overflow-wrap: anywhere; }
+.mini__name { font-weight: 500; }
+.mini__price { text-align: right; font-weight: 500; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
+.steps li { position: relative; }
+.steps__i { display: flex; align-items: center; gap: 12px; min-height: 56px; width: 100%; color: var(--soot); text-decoration: none; }
+.steps__n { width: 28px; height: 28px; display: grid; place-items: center; flex: none; border: 1px solid currentColor; font-weight: 600; font-size: 13px; }
+.steps li::before { content: ''; position: absolute; left: 0; right: 0; top: -1px; height: 2px; background: transparent; }
+.steps .is-now::before { background: var(--kajal); }
+.steps .is-done::before { background: var(--kajal); }
+.steps .is-now .steps__i { color: var(--kajal); font-weight: 600; }
+.steps .is-now .steps__n { background: var(--kajal); color: var(--chuna); border-color: var(--kajal); }
+.steps .is-done .steps__i { color: var(--kajal); }
+button.steps__i:hover .steps__t { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.co__panel h2:focus { outline: none; }
+.co__lead { margin-top: 12px; max-width: 46ch; }
+.co__grid { margin-top: 32px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px var(--gutter); }
+.co__grid > .field { grid-column: span 6; }
+.co__grid > .f-half { grid-column: span 3; }
+.co__grid > .f-third { grid-column: span 2; }
+.co__grid > .f-twothirds { grid-column: span 4; }
+.co__grid > .form__status { grid-column: 1 / -1; }
+.co__actions { margin-top: 40px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
+.co__hi p { overflow-wrap: anywhere; }
+.co__hi { margin-top: 32px; padding: 20px 24px; background: var(--mist); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.choice { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); }
+.choice__card { border-top: 2px solid var(--kajal); padding-top: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.choice__card .btn { margin-top: 16px; }
+.rv { margin-top: 32px; border-top: 1px solid var(--rule); }
+.rv__b { display: grid; grid-template-columns: 140px minmax(0, 1fr) auto; column-gap: 24px; align-items: baseline; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+.rv__b address { font-style: normal; }
+.rv__b p, .rv__b address { overflow-wrap: anywhere; }
+.rv__change { min-height: 44px; display: inline-flex; align-items: center; }
+.done { max-width: 880px; }
+.done__lead { margin-top: 20px; }
+.done__what { margin-top: 48px; }
+.done__what .mini { margin-top: 12px; border-top: 1px solid var(--rule); }
+.done__what .sumrow { border-bottom: 0; }
+.done__actions { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 16px; }
+
+/* a tablet held wide or a small laptop (900 to 1279 px, not stacked): the lines' eight columns are only 610 px at 1024, so the
+   picture and the gaps give way and the words keep about 220 px; in the checkout summary the price takes a row of its own */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .line { grid-template-columns: 96px minmax(0, 1fr) auto 104px; column-gap: 20px; }
+  .line > .thumb { width: 96px; }
+  :root:not(.is-narrow) .co .summary { padding: 24px; }
+  :root:not(.is-narrow) .summary .mini__line { grid-template-columns: 48px minmax(0, 1fr); column-gap: 12px; }
+  :root:not(.is-narrow) .summary .mini__line .thumb--s { width: 48px; }
+  :root:not(.is-narrow) .summary .mini__price { grid-column: 2; text-align: left; margin-top: 2px; }
+}
+/* a window 900 to 959 px wide that is not stacked (a laptop window snapped to half a screen; narrower ones are stacked by NARROW in
+   js/core/env.js): beside the summary the lines' eight columns leave the words 136 to 175 px (the set's name wraps to four lines), so the
+   summary goes under the lines and the lines take the whole width (the words keep 400 px or more). From 960 px the side-by-side layout
+   above holds (176 px and more, 219 at 1024). */
+@media (min-width: 900px) and (max-width: 959px) {
+  :root:not(.is-narrow) .bag__lines { grid-column: 1 / -1; }
+  :root:not(.is-narrow) .bag > .summary { grid-column: 1 / -1; position: static; margin-top: 40px; }
+}
+
+/* ========== 8. The Chuna pages, narrow ========== */
+:where(.is-narrow) .cpage { padding: 40px var(--margin) 96px; }
+:where(.is-narrow) .bag, :where(.is-narrow) .co { display: flex; flex-direction: column; align-items: stretch; margin-top: 32px; }
+:where(.is-narrow) .summary { position: static; margin: 40px calc(-1 * var(--margin)) 0; padding: 32px var(--margin); }
+:where(.is-narrow) .line { grid-template-columns: 88px minmax(0, 1fr); column-gap: 20px; row-gap: 16px; }
+:where(.is-narrow) .line .thumb { width: 88px; grid-row: 1 / span 2; }
+:where(.is-narrow) .line > .line__remove { grid-column: 2; grid-row: 3; margin-top: 0; }
+:where(.is-narrow) .line__qty { grid-column: 2; }
+:where(.is-narrow) .line__price { grid-column: 2; grid-row: 2; justify-self: end; align-self: center; padding-top: 0; }
+:where(.is-narrow) .line__qty { grid-row: 2; justify-self: start; }
+/* under 390 px the stepper and a five- or six-figure price no longer fit side by side: the price goes down beside Remove */
+@media (max-width: 389px) { :where(.is-narrow) .line__price { grid-row: 3; } }
+:where(.is-narrow) .tenline { grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); }
+:where(.is-narrow) .tenline::before, :where(.is-narrow) .tenline__well { display: none; }
+:where(.is-narrow) .tenline__item { flex-direction: row; align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid var(--rule); text-align: left; }
+:where(.is-narrow) .tenline__item .chip { display: block; flex: none; }
+:where(.is-narrow) .tenline__n, :where(.is-narrow) .tenline__art { margin: 0; font-weight: 400; }
+:where(.is-narrow) .acct { display: block; padding: 0 var(--margin); min-height: 0; }
+:where(.is-narrow) .acct__pic { position: relative; top: auto; height: 30svh; margin: 0 calc(-1 * var(--margin)); }
+:where(.is-narrow) .acct__panel { padding: 40px 0 96px; }
+:where(.is-narrow) .co__main { order: 1; }
+:where(.is-narrow) .co .summary { order: 2; }
+:where(.is-narrow) .steps__i { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 0; }
+:where(.is-narrow) .co__grid > .f-half, :where(.is-narrow) .co__grid > .f-third, :where(.is-narrow) .co__grid > .f-twothirds { grid-column: span 6; }
+:where(.is-narrow) .co__grid > .f-pin { grid-column: span 3; }
+:where(.is-narrow) .choice { grid-template-columns: 1fr; gap: 40px; }
+:where(.is-narrow) .rv__b { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; }
+:where(.is-narrow) .rv__b > .t-label { grid-column: 1 / -1; }
+:where(.is-narrow) .co__actions .btn { width: 100%; }
+.acct__pre { margin-bottom: 16px; }
+.line__name { font-size: min(var(--t-h3), 32px); }
+.co__h { margin: 0; }
+.bagpage .cpage { padding-top: 48px; }
+main:has(.co) .cpage { padding-top: 48px; }   /* its own rule: a browser without :has() drops the whole rule it appears in */
+main:has(.co) .co { margin-top: 32px; }
+.co__panel { margin-top: 40px; }
+.co__panel--first { margin-top: 0; }
+
+/* product.html with an edition that does not exist */
+.missing .cpage { padding-top: calc(var(--nav-h) + var(--s9)); }
+.missing__h { margin-top: 20px; }
+.missing__lead { margin-top: 20px; }
+.missing__btn { margin-top: 32px; }
+
+/* the unwrap's numbered marks carry the details; their words are in the list beside the painting */
+.hotspot .hotspot__line, .hotspot.is-on .hotspot__line { display: none; }
+.hotspot .hotspot__cap, .hotspot.is-on .hotspot__cap { width: 1px; height: 1px; max-width: none; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.co__note { margin-top: 12px; color: var(--kajal); }
+/* Windows high contrast (forced colours) repaints every background, so the bars drawn as a background are given a system colour */
+@media (forced-colors: active) {
+  .seg__b[aria-selected="true"]::after, .steps .is-now::before, .steps .is-done::before, .tenline::before { background: CanvasText; forced-color-adjust: none; }
+}
+
+/* the cursor's hit-proxy over the hero bottle (js/shop/cursor.js): the pill reads "Unwrap" with the painting's chip, a click goes to Unwrap it. Mouse only. */
+.ph__stage .bhit { position: absolute; z-index: 3; left: 50%; top: 14vh; width: 19.6vh; height: 70.2vh; transform: translateX(-50%); display: block; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) { .ph__stage .bhit { pointer-events: auto; } }
+:where(.is-narrow) .ph__stage .bhit, .mode-flow .ph__stage .bhit { display: none; }
