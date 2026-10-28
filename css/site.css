@@ -98,6 +98,15 @@ main:focus { outline: none; }
 .noscript p { max-width: 34ch; margin: 0; font: 500 1.125rem/1.5 Mukta, system-ui, sans-serif; }
 /* Chuna is hand-made paper, never flat digital white: a fine grain at 4% */
 .paper { background-color: var(--chuna); background-image: var(--grain); }
+/* Pigment texture (JJ, 28 Oct 2026: "the colour grounds look too flat, add a real texture"): every flat colour ground (a shop world, a landing
+   stage, a product or bag page, the edition's own ground behind a bottle) carries one seamless 768 px tile of dry gouache on cotton paper:
+   a fine tooth, a soft mottling and a few paper fibres, white and black specks at about 10% so every colour and every ink keeps its contrast.
+   It is the ground's own background (no overlay layer, no blend mode), so it costs the compositor nothing. assets/img/tex-pigment.webp
+   is made by tools/hero/make_texture.py. Chuna keeps its own finer grain (.paper). */
+:root { --tex: url("../assets/img/tex-pigment.webp"); }
+:root .frame, :root .tf, :root .cal10, :root .spec, :root .craft__geru, :root .lx--hours .lx__stage, :root .lx--ten .lx__stage, :root .lx--world .lx__stage, :root .page:not(.paper) {   /* :root in front: the sheets that load after this one set `background` as a shorthand on the same elements */
+  background-image: var(--tex); background-size: 768px 768px; background-repeat: repeat;
+}
 :root {
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .32 0 0 0 0 .26 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
 }
@@ -220,6 +229,7 @@ main:focus { outline: none; }
 .nav-band .nav::before { opacity: 1; }
 /* html.nav-grain (chrome.js, on every page whose band it keeps): the band is the same paper as the page */
 .nav-grain .nav::before { background-image: var(--grain); }
+html:not(.nav-grain) .nav::before, html:not(.nav-grain) .navband { background-image: var(--tex); background-size: 768px 768px; }   /* the header's band over a colour ground carries the same pigment, so no flat strip shows at the top */
 .nav__left, .nav__right { position: relative; display: flex; align-items: center; }
 /* the logo may take its own ink (the landing's ten designs, where a colour line crosses the bar) */
 .nav__left { color: var(--nav-ink-l, var(--nav-ink)); }
